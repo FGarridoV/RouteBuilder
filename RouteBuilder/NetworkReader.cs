@@ -6,7 +6,7 @@ namespace RouteBuilder
 {
     public class NetworkReader
     {
-        public int nNodes;
+        public int nNodes; 
         public int nLinks;
         public List<int[]> nodesInfo;
         public List<int[]> linksInfo;

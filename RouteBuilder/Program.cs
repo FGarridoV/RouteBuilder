@@ -6,7 +6,7 @@ namespace RouteBuilder
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to Route Builder by Tygger");
+            Console.WriteLine("Welcome to Route Builder by Tygger Inc.");
 
             NetworkReader nr = new NetworkReader("nodes.txt","links.txt");
             Console.WriteLine("Network charged");

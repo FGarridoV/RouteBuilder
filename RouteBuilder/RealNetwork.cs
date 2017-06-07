@@ -89,10 +89,87 @@ namespace RouteBuilder
             return headNodes;
         }
 
-        /*public double[] dijkstra(int nodeID1, int nodeID2)
+        public double dijkstraDist(int nodeID1, int nodeID2)
         {
+            List<RealNode> DijkNodes = new List<RealNode>(nodes);
+            double distance = 0;
 
+            foreach(RealNode n in DijkNodes)
+            {
+                if (n.ID == nodeID1)
+                    n.set_dijkstraTag(0);
+                else
+                    n.set_dijkstraTag(999999999999);
+            }
 
-        }*/
+            while (DijkNodes.Count>0)
+            {
+                
+                int pos = minPos(DijkNodes);
+                RealNode permanent = DijkNodes[pos];
+                DijkNodes.RemoveAt(pos);
+
+                if (pos == nodeID2)
+                    distance = permanent.get_dijkstraTag();
+
+                foreach(RealLink l in permanent.outerLinks)
+                {
+                    if (l.headNode.get_dijkstraTag() > permanent.get_dijkstraTag() + l.distance)
+                        l.headNode.set_dijkstraTag(permanent.get_dijkstraTag() + l.distance);
+                }
+            }
+
+            return distance;
+
+        }
+
+		public double dijkstraNodes(int nodeID1, int nodeID2)
+		{
+			List<RealNode> DijkNodes = new List<RealNode>(nodes);
+			double nNodes = 0;
+
+			foreach (RealNode n in DijkNodes)
+			{
+				if (n.ID == nodeID1)
+					n.set_dijkstraTag(0);
+				else
+					n.set_dijkstraTag(999999999999);
+			}
+
+			while (DijkNodes.Count > 0)
+			{
+
+				int pos = minPos(DijkNodes);
+				RealNode permanent = DijkNodes[pos];
+				DijkNodes.RemoveAt(pos);
+
+				if (pos == nodeID2)
+					nNodes = permanent.get_dijkstraTag();
+
+				foreach (RealLink l in permanent.outerLinks)
+				{
+					if (l.headNode.get_dijkstraTag() > permanent.get_dijkstraTag() + 1)
+						l.headNode.set_dijkstraTag(permanent.get_dijkstraTag() + 1);
+				}
+			}
+
+			return nNodes;
+
+		}
+
+        public int minPos(List<RealNode> list)
+        {
+            double min = 9999999999;
+            int resp = -1;
+            for (int i = 0; i < list.Count;i++)
+            {
+                if (list[i].get_dijkstraTag() <= min)
+                {
+                    min = list[i].get_dijkstraTag();
+                    resp = i;
+                }   
+            }
+            return resp;
+        }
     }
 }

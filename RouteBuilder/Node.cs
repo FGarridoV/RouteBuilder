@@ -5,6 +5,7 @@ namespace RouteBuilder
     {
         public Node()
         {
+           
         }
     }
 }

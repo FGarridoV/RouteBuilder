@@ -10,7 +10,7 @@ namespace RouteBuilder
         public List<RealLink> outerLinks;
         double[] position;
         public bool hasSensor;
-        public double[] dijkstraTag;
+        double dijkstraTag;
 
         public RealNode(int ID, double posX, double posY)
         {
@@ -58,6 +58,16 @@ namespace RouteBuilder
                     return n;
             }
             return null;
+        }
+
+        public void set_dijkstraTag(double distance)
+        {
+            this.dijkstraTag = distance        
+        }
+
+        public double get_dijkstraTag()
+        {
+            return this.dijkstraTag;
         }
     }
 }

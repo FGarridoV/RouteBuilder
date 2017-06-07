@@ -8,6 +8,7 @@ namespace RouteBuilder
         public RealNode tailNode;
         public RealNode headNode;
         public double distance;
+        public double dijkstraDistance;
 
         public RealLink(int ID, RealNode tailNode, RealNode headNode)
         {
@@ -22,6 +23,12 @@ namespace RouteBuilder
 
 			this.distance = Math.Sqrt(Math.Pow(y2 - y1, 2) + Math.Pow(x2 - x1, 2));
         }
+
+        public void set_dijkstraDistance(double distance)
+        {
+            this.dijkstraDistance = distance;
+        }
+
 
 
     }
