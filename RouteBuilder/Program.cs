@@ -9,10 +9,10 @@ namespace RouteBuilder
             Console.WriteLine("Welcome to Route Builder by Tygger Inc.");
 
             NetworkReader nr = new NetworkReader("nodes.txt","links.txt");
-            Console.WriteLine("Network charged");
+            Console.WriteLine("Network loaded");
 
             DataBaseReader dbr = new DataBaseReader("db.txt");
-            Console.WriteLine("Data base charged");
+            Console.WriteLine("Data base loaded");
 
             RealNetwork rn = new RealNetwork(nr.nodesInfo,nr.linksInfo);
             Console.WriteLine("Real network created");
