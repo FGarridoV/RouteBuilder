@@ -9,6 +9,8 @@ namespace RouteBuilder
         public RealNode headNode;
         public double distance;
         public double dijkstraDistance;
+        public double dijkstraNodes;
+
 
         public RealLink(int ID, RealNode tailNode, RealNode headNode)
         {
@@ -28,6 +30,11 @@ namespace RouteBuilder
         {
             this.dijkstraDistance = distance;
         }
+
+		public void set_dijkstraNodes(double nodes)
+		{
+			this.dijkstraNodes = nodes;
+		}
 
 
 

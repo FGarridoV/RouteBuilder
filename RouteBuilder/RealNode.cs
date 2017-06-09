@@ -62,7 +62,7 @@ namespace RouteBuilder
 
         public void set_dijkstraTag(double distance)
         {
-            this.dijkstraTag = distance        
+            this.dijkstraTag = distance;      
         }
 
         public double get_dijkstraTag()

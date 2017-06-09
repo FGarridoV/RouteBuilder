@@ -17,8 +17,11 @@ namespace RouteBuilder
             RealNetwork rn = new RealNetwork(nr.nodesInfo,nr.linksInfo);
             Console.WriteLine("Real network created");
 
-            RealNetwork model = rn.real_to_model();
+            RealNetwork mn = rn.real_to_model();
+            mn.set_DijkstraData(rn);
+            Network modelNet = new Network(mn);
             Console.WriteLine("Model network created");
+
 
             //Crear red de tipo NETWORK para trabajar
 

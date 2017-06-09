@@ -5,8 +5,8 @@ namespace RouteBuilder
 {
     public class RealNetwork
     {
-        List<RealNode> nodes;
-        List<RealLink> links;
+        public List<RealNode> nodes;
+        public List<RealLink> links;
 
         public RealNetwork(List<RealNode> nodes, List<RealLink> links)
         {
@@ -99,7 +99,7 @@ namespace RouteBuilder
                 if (n.ID == nodeID1)
                     n.set_dijkstraTag(0);
                 else
-                    n.set_dijkstraTag(999999999999);
+                    n.set_dijkstraTag(9999999999999);
             }
 
             while (DijkNodes.Count>0)
@@ -107,10 +107,11 @@ namespace RouteBuilder
                 
                 int pos = minPos(DijkNodes);
                 RealNode permanent = DijkNodes[pos];
-                DijkNodes.RemoveAt(pos);
 
-                if (pos == nodeID2)
-                    distance = permanent.get_dijkstraTag();
+				if (DijkNodes[pos].ID == nodeID2)
+					distance = permanent.get_dijkstraTag();
+
+                DijkNodes.RemoveAt(pos);
 
                 foreach(RealLink l in permanent.outerLinks)
                 {
@@ -126,14 +127,14 @@ namespace RouteBuilder
 		public double dijkstraNodes(int nodeID1, int nodeID2)
 		{
 			List<RealNode> DijkNodes = new List<RealNode>(nodes);
-			double nNodes = 0;
+			double distance = 0;
 
 			foreach (RealNode n in DijkNodes)
 			{
 				if (n.ID == nodeID1)
 					n.set_dijkstraTag(0);
 				else
-					n.set_dijkstraTag(999999999999);
+					n.set_dijkstraTag(9999999999999);
 			}
 
 			while (DijkNodes.Count > 0)
@@ -141,10 +142,11 @@ namespace RouteBuilder
 
 				int pos = minPos(DijkNodes);
 				RealNode permanent = DijkNodes[pos];
-				DijkNodes.RemoveAt(pos);
 
-				if (pos == nodeID2)
-					nNodes = permanent.get_dijkstraTag();
+				if (DijkNodes[pos].ID == nodeID2)
+					distance = permanent.get_dijkstraTag();
+
+				DijkNodes.RemoveAt(pos);
 
 				foreach (RealLink l in permanent.outerLinks)
 				{
@@ -153,13 +155,13 @@ namespace RouteBuilder
 				}
 			}
 
-			return nNodes;
+			return distance;
 
 		}
 
         public int minPos(List<RealNode> list)
         {
-            double min = 9999999999;
+            double min = list[0].get_dijkstraTag();
             int resp = -1;
             for (int i = 0; i < list.Count;i++)
             {
@@ -171,5 +173,17 @@ namespace RouteBuilder
             }
             return resp;
         }
+
+        public void set_DijkstraData(RealNetwork RealNet)
+        {
+            foreach(RealLink l in this.links)
+            {
+                double nod = RealNet.dijkstraNodes(l.tailNode.ID, l.headNode.ID);
+                double dist = RealNet.dijkstraDist(l.tailNode.ID, l.headNode.ID);
+                l.set_dijkstraDistance(dist);
+                l.set_dijkstraNodes(nod);
+            }
+        }
+
     }
 }
