@@ -9,6 +9,7 @@ namespace RouteBuilder
 		public double distanceCost;
 		public double edgesCost;
         public double angularCost;
+        public double mainCost;
 
 
         public Link(RealLink l)

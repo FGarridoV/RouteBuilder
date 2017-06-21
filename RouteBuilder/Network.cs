@@ -30,7 +30,44 @@ namespace RouteBuilder
                 Node.pos_node_by_ID(hn, nodes).add_innerLink(linkAux);
                 links.Add(linkAux);
             }
+        }
+
+        public Node nodeByID(int ID)
+        {
+            foreach(Node n in nodes)
+            {
+                if (n.ID == ID)
+                    return n;
+            }
+            return null;
+        }
+
+		public Link LinkByNodesID(int tailID, int headID)
+		{
+			foreach (Link l in links)
+			{
+                if (l.tailNode.ID == tailID && l.headNode.ID == headID)
+					return l;
+			}
+			return null;
+		}
+
+        public void set_angularCost_by_id(int linkID, double val)
+        {
+            foreach(Link l in links)
+            {
+                if(l.ID == linkID)
+                {
+                    l.angularCost = val;
+                    break;
+                }
+            }
+        }
+
+        public List<Path> YenKsP(int SourceNodeID, int SinkNodeID, int k, int CostType)
+        {
             
         }
+
     }
 }
