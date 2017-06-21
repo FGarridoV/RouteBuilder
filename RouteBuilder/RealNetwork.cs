@@ -99,7 +99,7 @@ namespace RouteBuilder
                 if (n.ID == nodeID1)
                     n.set_dijkstraTag(0);
                 else
-                    n.set_dijkstraTag(9999999999999);
+                    n.set_dijkstraTag(double.PositiveInfinity);
             }
 
             while (DijkNodes.Count>0)
@@ -134,7 +134,7 @@ namespace RouteBuilder
 				if (n.ID == nodeID1)
 					n.set_dijkstraTag(0);
 				else
-					n.set_dijkstraTag(9999999999999);
+					n.set_dijkstraTag(double.PositiveInfinity);
 			}
 
 			while (DijkNodes.Count > 0)
