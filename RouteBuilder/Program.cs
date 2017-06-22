@@ -6,6 +6,9 @@ namespace RouteBuilder
     {
         public static void Main(string[] args)
         {
+            //Definitions
+            double newTravelTime = 10 * 60;
+
             Console.WriteLine("Welcome to Route Builder by Tygger Inc.");
 
             NetworkReader nr = new NetworkReader("nodes.txt","links.txt");

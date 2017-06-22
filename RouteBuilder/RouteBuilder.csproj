@@ -46,6 +46,8 @@
     <Compile Include="Vehicle.cs" />
     <Compile Include="Detection.cs" />
     <Compile Include="DetectionsDB.cs" />
+    <Compile Include="Scenario.cs" />
+    <Compile Include="Travel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
