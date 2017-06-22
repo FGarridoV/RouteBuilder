@@ -9,8 +9,7 @@ namespace RouteBuilder
 
         public Travel()
         {
-            detections
-           
+            detections = new List<Detection>(); 
         }
     }
 }
