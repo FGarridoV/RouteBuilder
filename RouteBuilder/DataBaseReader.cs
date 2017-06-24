@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -6,7 +6,7 @@ namespace RouteBuilder
 {
     public class DataBaseReader
     {
-        List<double[]> BTData;
+        public List<double[]> BTData;
 
         public DataBaseReader(string fileName)
         {

@@ -1,4 +1,5 @@
 ﻿﻿using System;
+using System.Collections.Generic;
 namespace RouteBuilder
 {
     public class Link
@@ -10,6 +11,7 @@ namespace RouteBuilder
 		public double edgesCost;
         public double angularCost;
         public double mainCost;
+        public List<TravelTimes> tTimes;
 
 
         public Link(RealLink l)

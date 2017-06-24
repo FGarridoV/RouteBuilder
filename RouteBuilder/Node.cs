@@ -10,6 +10,7 @@ namespace RouteBuilder
 		public List<Link> outerLinks;
 		public double x;
         public double y;
+        public List<DwellTimes> dTimes;
 
         public Node(RealNode n)
         {

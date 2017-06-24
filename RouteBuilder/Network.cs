@@ -64,10 +64,10 @@ namespace RouteBuilder
             }
         }
 
-        public List<Path> YenKsP(int SourceNodeID, int SinkNodeID, int k, int CostType)
+        /*public List<Path> YenKsP(int SourceNodeID, int SinkNodeID, int k, int CostType)
         {
             
-        }
+        }*/
 
     }
 }

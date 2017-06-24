@@ -8,7 +8,7 @@ namespace RouteBuilder
 
         List<Vehicle> vehicles;
 
-        public Scenario(DetectionsDB dets)
+        public Scenario(DetectionsDB dets, double timeNewTravel)
         {
             vehicles = new List<Vehicle>();
 
@@ -25,6 +25,9 @@ namespace RouteBuilder
                     add_detection_by_mac(d);
                 }
             }
+            add_travels_all_vehicles(timeNewTravel);
+
+
         }
 
         public bool new_MAC(int mac)
@@ -47,6 +50,14 @@ namespace RouteBuilder
                 {
                     v.add_new_detection(d);
                 }
+            }
+        }
+
+        public void add_travels_all_vehicles(double timeNewTravel)
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                v.generate_travels(timeNewTravel);
             }
         }
 

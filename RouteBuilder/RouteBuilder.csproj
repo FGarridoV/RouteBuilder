@@ -48,6 +48,8 @@
     <Compile Include="DetectionsDB.cs" />
     <Compile Include="Scenario.cs" />
     <Compile Include="Travel.cs" />
+    <Compile Include="DwellTimes.cs" />
+    <Compile Include="TravelTimes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

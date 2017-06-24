@@ -7,7 +7,7 @@ namespace RouteBuilder
         public static void Main(string[] args)
         {
             //Definitions
-            double newTravelTime = 10 * 60;
+            double newTravelTime = 30 * 60;
 
             Console.WriteLine("Welcome to Route Builder by Tygger Inc.");
 
@@ -15,6 +15,7 @@ namespace RouteBuilder
             Console.WriteLine("Network loaded");
 
             DataBaseReader dbr = new DataBaseReader("db.txt");
+            DetectionsDB DB = new DetectionsDB(dbr.BTData);
             Console.WriteLine("Data base loaded");
 
             RealNetwork rn = new RealNetwork(nr.nodesInfo,nr.linksInfo);
@@ -24,9 +25,10 @@ namespace RouteBuilder
             mn.set_DijkstraData(rn);
             Network modelNet = new Network(mn);
             Console.WriteLine("Model network created");
+              
+            Scenario sc = new Scenario(DB, newTravelTime);
+            Console.WriteLine("Total of vehicles loaded");
 
-
-            //Crear red de tipo NETWORK para trabajar
 
             //Asignar tiempos de permanencia a los nodos
 
