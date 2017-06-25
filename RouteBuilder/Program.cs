@@ -6,8 +6,9 @@ namespace RouteBuilder
     {
         public static void Main(string[] args)
         {
-            //Definitions
+            //Definitions (in seconds)
             double newTravelTime = 30 * 60;
+            double timePeriod = 10 * 60;
 
             Console.WriteLine("Welcome to Route Builder by Tygger Inc.");
 

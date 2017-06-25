@@ -6,8 +6,8 @@ namespace RouteBuilder
     public class Vehicle
     {
         public int MAC;
-        List<Detection> allDetections;
-        List<Travel> travels;
+        public List<Detection> allDetections;
+        public List<Travel> travels;
 
         public Vehicle(int MAC)
         {

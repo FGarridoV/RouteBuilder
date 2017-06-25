@@ -5,7 +5,7 @@ namespace RouteBuilder
 {
     public class Travel
     {
-		public List<Detection> detections;
+        public List<Detection> detections;
 
         public Travel()
         {

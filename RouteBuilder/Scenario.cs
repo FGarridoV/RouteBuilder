@@ -61,6 +61,44 @@ namespace RouteBuilder
             }
         }
 
+        public void add_times_to_nodes_and_links(Network net)
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Travel t in v.travels)
+                {
+                    for(int i = 0; i < t.detections.Count-1;i++)
+                    {
+                        if(t.detections[i].BSID==t.detections[i+1].BSID)
+                        {
+                            int end = i + 1;
+                            for(int j = i + 2; j < t.detections.Count;j++)
+                            {
+                                if(t.detections[i].BSID == t.detections[j].BSID)
+                                {
+                                    end = j;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            double dTimeAux = t.detections[end].time - t.detections[i].time;
+                            i = end-1;//ojo con el iterador
+                        }
+
+                        else
+                        {
+                            if(net.Can_I_go_in_one_link(t.detections[i].BSID,t.detections[i + 1].BSID))
+                            {
+                                double tTimeAux = t.detections[i + 1].time - t.detections[i].time;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
 
     }

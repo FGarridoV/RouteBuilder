@@ -15,10 +15,11 @@ namespace RouteBuilder
         public Node(RealNode n)
         {
             this.ID = n.ID;
-            innerLinks = new List<Link>();
-            outerLinks = new List<Link>();
+            this.innerLinks = new List<Link>();
+            this.outerLinks = new List<Link>();
             this.x = n.get_position()[0];
             this.y = n.get_position()[1];
+            this.dTimes = new List<DwellTimes>();
         }
 
         public void add_innerLink(Link l)
@@ -45,6 +46,11 @@ namespace RouteBuilder
                 i++;
             }
             return nodeList[resp];
+        }
+
+        public void set_dwell_times()
+        {
+            
         }
     }
 }

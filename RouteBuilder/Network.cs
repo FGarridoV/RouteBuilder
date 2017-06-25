@@ -64,6 +64,14 @@ namespace RouteBuilder
             }
         }
 
+        public bool Can_I_go_in_one_link(int nodeSource, int nodeSink)
+        {
+            if (LinkByNodesID(nodeSource, nodeSink) == null)
+                return false;
+            else
+                return true;
+        }
+
         /*public List<Path> YenKsP(int SourceNodeID, int SinkNodeID, int k, int CostType)
         {
             
