@@ -48,9 +48,33 @@ namespace RouteBuilder
             return nodeList[resp];
         }
 
-        public void set_dwell_times()
+        public void set_dwell_time_at_period(int period, double time)
         {
+            if (exist_period(period))
+            {
+                foreach(DwellTimes d in dTimes)
+                {
+                    if (d.ID_period == period)
+                        d.add_dTime(time);
+                }
+            }
+            else
+            {
+                DwellTimes dts = new DwellTimes(period);
+                dts.add_dTime(time);
+            }
             
+        }
+
+        public bool exist_period(int period)
+        {
+            foreach(DwellTimes d in dTimes)
+            {
+                if (d.ID_period == period)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

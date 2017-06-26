@@ -8,7 +8,7 @@ namespace RouteBuilder
 
         List<Vehicle> vehicles;
 
-        public Scenario(DetectionsDB dets, double timeNewTravel)
+        public Scenario(DetectionsDB dets, Network net double timeNewTravel, double timePeriod)
         {
             vehicles = new List<Vehicle>();
 
@@ -26,8 +26,7 @@ namespace RouteBuilder
                 }
             }
             add_travels_all_vehicles(timeNewTravel);
-
-
+            add_times_to_nodes_and_links(net,timePeriod);
         }
 
         public bool new_MAC(int mac)
@@ -61,7 +60,7 @@ namespace RouteBuilder
             }
         }
 
-        public void add_times_to_nodes_and_links(Network net)
+        public void add_times_to_nodes_and_links(Network net, double timePeriod)
         {
             foreach(Vehicle v in vehicles)
             {
@@ -84,7 +83,9 @@ namespace RouteBuilder
                                 }
                             }
                             double dTimeAux = t.detections[end].time - t.detections[i].time;
-                            i = end-1;//ojo con el iterador
+                            int period = (int)Math.Ceiling(t.detections[i].time / timePeriod);
+                            net.nodeByID(t.detections[i].BSID).set_dwell_time_at_period(period,dTimeAux);
+                            i = end-1;
                         }
 
                         else
@@ -92,6 +93,8 @@ namespace RouteBuilder
                             if(net.Can_I_go_in_one_link(t.detections[i].BSID,t.detections[i + 1].BSID))
                             {
                                 double tTimeAux = t.detections[i + 1].time - t.detections[i].time;
+                                int period = (int)Math.Ceiling(t.detections[i].time / timePeriod);
+                                net.LinkByNodesID(t.detections[i].BSID,t.detections[i+1].BSID).set_travel_time_at_period(period,tTimeAux);
                             }
                         }
                     }

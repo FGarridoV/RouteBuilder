@@ -5,13 +5,18 @@ namespace RouteBuilder
 {
     public class TravelTimes
     {
-        int ID_period;
-        List<double> times;
+        public int ID_period;
+        public List<double> times;
 
-        public TravelTimes()
+        public TravelTimes(int ID_period)
         {
+			this.ID_period = ID_period;
+			this.times = new List<double>();
+		}
 
-
-        }
+		public void add_tTime(double time)
+		{
+			this.times.Add(time);
+		}
     }
 }

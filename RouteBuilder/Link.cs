@@ -31,6 +31,34 @@ namespace RouteBuilder
             this.headNode = n;
 		}
 
+		public void set_travel_time_at_period(int period, double time)
+		{
+			if (exist_period(period))
+			{
+				foreach (TravelTimes t in tTimes)
+				{
+					if (t.ID_period == period)
+						t.add_tTime(time);
+				}
+			}
+			else
+			{
+				DwellTimes dts = new DwellTimes(period);
+				dts.add_dTime(time);
+			}
+
+		}
+
+		public bool exist_period(int period)
+		{
+			foreach (TravelTimes t in tTimes)
+			{
+				if (t.ID_period == period)
+					return true;
+			}
+			return false;
+		}
+
 
     }
 }
