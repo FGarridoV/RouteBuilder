@@ -8,7 +8,7 @@ namespace RouteBuilder
 
         List<Vehicle> vehicles;
 
-        public Scenario(DetectionsDB dets, Network net double timeNewTravel, double timePeriod)
+        public Scenario(DetectionsDB dets, Network net, double timeNewTravel, double timePeriod)
         {
             vehicles = new List<Vehicle>();
 

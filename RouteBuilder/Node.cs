@@ -62,6 +62,7 @@ namespace RouteBuilder
             {
                 DwellTimes dts = new DwellTimes(period);
                 dts.add_dTime(time);
+                dTimes.Add(dts);
             }
             
         }

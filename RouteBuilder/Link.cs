@@ -19,6 +19,7 @@ namespace RouteBuilder
             this.ID = l.ID;
             this.distanceCost = l.dijkstraDistance;
             this.edgesCost = l.dijkstraNodes;
+            this.tTimes = new List<TravelTimes>();
         }
 
         public void add_tailNode(Node n)
@@ -43,8 +44,9 @@ namespace RouteBuilder
 			}
 			else
 			{
-				DwellTimes dts = new DwellTimes(period);
-				dts.add_dTime(time);
+                TravelTimes tts = new TravelTimes(period);
+				tts.add_tTime(time);
+                tTimes.Add(tts);
 			}
 
 		}
