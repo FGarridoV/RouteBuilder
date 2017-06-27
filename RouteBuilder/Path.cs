@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RouteBuilder
 {
-    public class Path
+    public class Path : IComparable<Path>
     {
 		public List<int> nodesIDs;
 		public List<Node> nodes;
@@ -24,34 +24,66 @@ namespace RouteBuilder
             }
         }
 
-        public void set_angular_costs(Network net)
+        public bool Equals(Path p)
         {
-            double angCost;
-
-            foreach(Link l in links)
+            if(this.nodesIDs.Count == p.nodesIDs.Count)
             {
-                angCost = angular_cost_value(l, nodes[nodes.Count - 1]);
-                net.set_angularCost_by_id(l.ID,angCost);
+                for (int i = 0; i < this.nodesIDs.Count;i++)
+                {
+                    if (this.nodesIDs[i] == p.nodesIDs[i])
+                        continue;
+                    else
+                        return false;
+                }
             }
+
+            else
+            {
+                return false;
+            }
+            return true;
         }
 
-        public double angular_cost_value(Link l, Node sink)
+        public static bool areEquals(List<int> nodes1,List<int> nodes2) 
         {
-            double[] p1 = new double[] { l.tailNode.x , l.tailNode.y };
-            double[] p2 = new double[] { l.headNode.x, l.headNode.y };
-            double[] p3 = new double[] { sink.x, sink.y };
+			if (nodes1.Count == nodes2.Count)
+			{
+				for (int i = 0; i < nodes1.Count; i++)
+				{
+					if (nodes1[i] == nodes2[i])
+						continue;
+					else
+						return false;
+				}
+			}
 
-            double a = Math.Sqrt(Math.Pow(p2[1] - p1[1], 2) + Math.Pow(p2[0] - p1[0], 2));
-            double b = Math.Sqrt(Math.Pow(p3[1] - p1[1], 2) + Math.Pow(p3[0] - p1[0], 2));
-            double c = Math.Sqrt(Math.Pow(p2[1] - p3[1], 2) + Math.Pow(p2[0] - p3[0], 2));
-
-            double cosAngle = (Math.Pow(a, 2) + Math.Pow(b, 2) - Math.Pow(c, 2)) / (2 * a * b);
-            double alfa = Math.Acos(cosAngle);
-
-            double Acost = l.distanceCost * Math.Sin(alfa / 2);
-            return Acost;
+			else
+			{
+				return false;
+			}
+			return true;
         }
 
-       
+        public List<int> some_nodes(int start_index, int last_index)
+        {
+            List<int> someNodes = new List<int>();
+            for (int i = start_index; i <= last_index;i++)
+            {
+                someNodes.Add(nodesIDs[i]);
+            }
+            return someNodes;
+        }
+
+        public int CompareTo(Path other)
+        {
+			if (this.time > other.time)
+				return 1;
+
+			else if (this.time < other.time)
+				return -1;
+
+			else
+				return 0;
+        }
     }
 }

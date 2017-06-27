@@ -26,9 +26,11 @@ namespace RouteBuilder
             mn.set_DijkstraData(rn);
             Network modelNet = new Network(mn);
             Console.WriteLine("Model network created");
-              
+
             Scenario sc = new Scenario(DB,modelNet, newTravelTime,timePeriod);
             Console.WriteLine("Dwell times and travel times loaded");
+
+            sc.make_prediction(modelNet, mn);
 
 
             //Asignar tiempos de permanencia a los nodos

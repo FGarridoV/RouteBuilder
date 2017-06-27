@@ -13,7 +13,6 @@ namespace RouteBuilder
         public double mainCost;
         public List<TravelTimes> tTimes;
 
-
         public Link(RealLink l)
         {
             this.ID = l.ID;

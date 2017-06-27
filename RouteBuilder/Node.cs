@@ -11,6 +11,8 @@ namespace RouteBuilder
 		public double x;
         public double y;
         public List<DwellTimes> dTimes;
+        public double cTAG;
+        public int pTAG;
 
         public Node(RealNode n)
         {
@@ -77,5 +79,28 @@ namespace RouteBuilder
 
             return false;
         }
-    }
+
+		//methods just for clones of Network
+		public void delete_innerLink(int tailNodeID, int headNodeID)
+		{
+            for (int i = 0; i < innerLinks.Count; i++)
+			{
+				if (innerLinks[i].tailNode.ID == tailNodeID && innerLinks[i].headNode.ID == headNodeID)
+				{
+                    innerLinks.RemoveAt(i);
+				}
+			}
+		}
+
+		public void delete_outerLink(int tailNodeID, int headNodeID)
+		{
+			for (int i = 0; i < outerLinks.Count; i++)
+			{
+				if (outerLinks[i].tailNode.ID == tailNodeID && outerLinks[i].headNode.ID == headNodeID)
+				{
+					outerLinks.RemoveAt(i);
+				}
+			}
+		}
+	}
 }

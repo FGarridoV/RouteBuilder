@@ -60,6 +60,12 @@ namespace RouteBuilder
             }
         }
 
+        //metodo de prueba
+        public void make_prediction(Network net, RealNetwork mn)
+        {
+            vehicles[0].add_inferedTravels(net,mn,1);
+        }
+
         public void add_times_to_nodes_and_links(Network net, double timePeriod)
         {
             foreach(Vehicle v in vehicles)
