@@ -5,10 +5,13 @@ namespace RouteBuilder
 {
     public class Path : IComparable<Path>
     {
-		public List<int> nodesIDs;
+		//Class elements
+        public List<int> nodesIDs;
 		public List<Node> nodes;
 		public List<Link> links;
+        public double totalCost;
 
+        //Constructor
         public Path(List<int> nodesIDs, Network net)
         {
             this.nodesIDs = new List<int>(nodesIDs);
@@ -22,8 +25,11 @@ namespace RouteBuilder
                 if (i < nodesIDs.Count - 1)
                     links.Add(net.LinkByNodesID(nodesIDs[i], nodesIDs[i + 1]));
             }
+
+            add_totalCost();
         }
 
+        //Method 1: Compare 2 paths by nodes ID
         public bool Equals(Path p)
         {
             if(this.nodesIDs.Count == p.nodesIDs.Count)
@@ -36,7 +42,6 @@ namespace RouteBuilder
                         return false;
                 }
             }
-
             else
             {
                 return false;
@@ -44,6 +49,7 @@ namespace RouteBuilder
             return true;
         }
 
+        //Method 2: Compare 2 list of ints
         public static bool areEquals(List<int> nodes1,List<int> nodes2) 
         {
 			if (nodes1.Count == nodes2.Count)
@@ -64,6 +70,7 @@ namespace RouteBuilder
 			return true;
         }
 
+        //Method 3: Return a subgroup of nodes ints id
         public List<int> some_nodes(int start_index, int last_index)
         {
             List<int> someNodes = new List<int>();
@@ -74,12 +81,22 @@ namespace RouteBuilder
             return someNodes;
         }
 
+        //Method 4: Add the total cost to the Path
+        public void add_totalCost()
+        {
+            foreach(Link l in links)
+            {
+                this.totalCost += l.mainCost;
+            }
+        }
+
+        //Method 5: Compare to path with the cost
         public int CompareTo(Path other)
         {
-			if (this.time > other.time)
+            if (this.totalCost > other.totalCost)
 				return 1;
 
-			else if (this.time < other.time)
+            else if (this.totalCost < other.totalCost)
 				return -1;
 
 			else

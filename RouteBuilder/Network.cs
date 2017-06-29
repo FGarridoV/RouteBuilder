@@ -7,9 +7,11 @@ namespace RouteBuilder
 {
     public class Network
     {
-		public List<Node> nodes;
+		//Class elements
+        public List<Node> nodes;
 		public List<Link> links;
 
+        //Constructor from RealNetwork
         public Network(RealNetwork rn)
         {
             nodes = new List<Node>();
@@ -34,6 +36,39 @@ namespace RouteBuilder
             }
         }
 
+        //Constructor to make copies
+		public Network(Network net)
+		{
+			nodes = new List<Node>();
+			links = new List<Link>();
+
+			foreach (Node n in net.nodes)
+			{
+				Node nodeAux = new Node(n);
+				nodes.Add(nodeAux);
+			}
+
+			foreach (Link l in net.links)
+			{
+				Link linkAux = new Link(l);
+				int tn = l.tailNode.ID;
+				int hn = l.headNode.ID;
+				linkAux.add_tailNode(Node.pos_node_by_ID(tn, nodes));
+				linkAux.add_headNode(Node.pos_node_by_ID(hn, nodes));
+				Node.pos_node_by_ID(tn, nodes).add_outerLink(linkAux);
+				Node.pos_node_by_ID(hn, nodes).add_innerLink(linkAux);
+				links.Add(linkAux);
+			}
+		}
+
+        //Method 1: Create a new network equals to the original
+        public Network Clone()
+        {
+            Network n = new Network(this);
+            return n;
+        }
+
+        //Method 2: Returns the node by a specific ID
         public Node nodeByID(int ID)
         {
             foreach(Node n in nodes)
@@ -44,6 +79,7 @@ namespace RouteBuilder
             return null;
         }
 
+        //Method 3: Returns the link by the specific nodeTailID and nodeHeadID
 		public Link LinkByNodesID(int tailID, int headID)
 		{
 			foreach (Link l in links)
@@ -54,6 +90,7 @@ namespace RouteBuilder
 			return null;
 		}
 
+        //Method 4: Determine the value of angular cost of a link 
 		public double angular_cost_value(Link l, Node sink)
 		{
 			double[] p1 = new double[] { l.tailNode.x, l.tailNode.y };
@@ -71,6 +108,7 @@ namespace RouteBuilder
 			return Acost;
 		}
 
+        //Method 5: Assing the value of angular cost to all links 
         public void set_angularCosts(int SinkNode)
         {
             foreach(Link l in links)
@@ -79,6 +117,7 @@ namespace RouteBuilder
             }
         }
 
+        //Method 6: Indicates if it is possible go to one node to other in one step
         public bool Can_I_go_in_one_link(int nodeSource, int nodeSink)
         {
             if (LinkByNodesID(nodeSource, nodeSink) == null)
@@ -87,14 +126,15 @@ namespace RouteBuilder
                 return true;
         }
 
-        public Path dijkstra(int SourceNodeID, int SinkNodeID, Network net)
+        //Method 7: Return a path of minimal cost from 2 nodes, returns null if it is impossible
+        public Path dijkstra(int sourceNodeID, int sinkNodeID)
 		{
-			List<Node> allNodes = new List<Node>(net.nodes);
+            List<Node> allNodes = new List<Node>(nodes);
             List<Node> PermNodes = new List<Node>();
 
 			foreach (Node n in allNodes)
 			{
-                if (n.ID == SourceNodeID)
+                if (n.ID == sourceNodeID)
                 {
                     n.cTAG = 0;
                     n.pTAG = -1;
@@ -107,15 +147,21 @@ namespace RouteBuilder
                 }
 			}
 
-            while (PermNodes.Count < net.nodes.Count)
+            while (PermNodes.Count < nodes.Count)
 			{
-                int pos = minPos(allNodes);
+                int pos = minCost_pos(allNodes);
                 PermNodes.Add(allNodes[pos]);
 
-                if(allNodes[pos].ID == SinkNodeID)
+                if(allNodes[pos].ID == sinkNodeID)
                 {
                     break;
                 }
+
+                if(allNodes[pos].outerLinks.Count==0)
+                {
+					return null; 
+                }
+
 
                 allNodes.RemoveAt(pos);
 
@@ -133,9 +179,9 @@ namespace RouteBuilder
 			}
 
             return generate_path(PermNodes);
-
 		}
 
+        //Method 8: generate a path element from a node list output from Dijkstra
         public Path generate_path(List<Node> nList)
         {
             List<int> nods = new List<int>();
@@ -165,7 +211,8 @@ namespace RouteBuilder
             return ans;
         }
 
-		public int minPos(List<Node> list)
+        //Method 9: Indicates which node have the minCos cumulated to Dijkstra
+		public int minCost_pos(List<Node> list)
 		{
 			double min = list[0].cTAG;
 			int resp = -1;
@@ -180,89 +227,118 @@ namespace RouteBuilder
 			return resp;
 		}
 
-        public List<Path> YenKsP(int SourceNodeID, int SinkNodeID, int K, int CostType, RealNetwork mn)
+        //Method 10: Assing the parameter mainCost to all links
+        public void add_mainCost(int costType)
         {
-            Network netAux = new Network(mn);
-            netAux.set_angularCosts(SinkNodeID);
-
-            if (CostType == 0)
-            {
-                foreach(Link l in netAux.links)
-                {
-                    l.mainCost = l.distanceCost;
-                }
-            }
-
-            else if (CostType == 1)
-            {
-				foreach (Link l in netAux.links)
+			if (costType == 0)
+			{
+				foreach (Link l in this.links)
 				{
-                    l.mainCost = l.edgesCost;
+					l.mainCost = l.distanceCost;
 				}
-            }
+			}
 
-            else
-            {
-				foreach (Link l in netAux.links)
+			else if (costType == 1)
+			{
+				foreach (Link l in this.links)
 				{
-                    l.mainCost = l.angularCost;
+					l.mainCost = l.edgesCost;
 				}
-            }
+			}
+
+			else
+			{
+				foreach (Link l in this.links)
+				{
+					l.mainCost = l.angularCost;
+				}
+			}
+        }        
+
+        //Method 11: Determine Kht shortest path
+        public List<Path> YenKsP(int sourceNodeID, int sinkNodeID, int K, int costType)
+        {
+            this.set_angularCosts(sinkNodeID);
+            this.add_mainCost(costType);
+            Network netAux = new Network(this);
 
             List<Path> A = new List<Path>();
             List<Path> B = new List<Path>();
 
-            Path p0 = dijkstra(SourceNodeID, SinkNodeID, netAux);
+            Path p0 = netAux.dijkstra(sourceNodeID, sinkNodeID);
             A.Add(p0);
 
-            for (int k = 1; k <= K;k++)
+            for (int k = 1; k <= K; k++)
             {
-                for (int i = 0; i < A[k - 1].nodesIDs.Count;i++)
+                for (int i = 0; i < A[k - 1].nodesIDs.Count - 1; i++)
                 {
                     int spurNode = A[k - 1].nodesIDs[i];
                     List<int> rootPath = A[k - 1].some_nodes(0, i);
 
-                    foreach(Path p in A)
+                    foreach (Path p in A)
                     {
-                        if(Path.areEquals(rootPath,p.some_nodes(0,i)))
+                        if (Path.areEquals(rootPath, p.some_nodes(0, i)))
                         {
-                            netAux.delete_link_by_nodes_id(p.nodesIDs[i],p.nodesIDs[i+1]);
+                            netAux.delete_link_by_nodes_id(p.nodesIDs[i], p.nodesIDs[i + 1]);
                         }
                     }
 
                     foreach (int rootNode in rootPath)
                     {
-                        if(rootNode != spurNode)
+                        if (rootNode != spurNode)
                         {
-                            //remover rootNode del grafo
+                            netAux.delete_node_by_id(rootNode);
                         }
                     }
 
-                    Path spurPath = dijkstra(spurNode, SinkNodeID, netAux);
+                    Path spurPath = netAux.dijkstra(spurNode, sinkNodeID);
+
+                    if (spurPath == null)
+                    {
+                        netAux = new Network(this);
+                        continue;
+                    }
+
                     List<int> potentialNodes = new List<int>(rootPath);
-                    potentialNodes.RemoveAt(potentialNodes.Count-1);
-                    foreach(int nod in spurPath.nodesIDs)
+                    potentialNodes.RemoveAt(potentialNodes.Count - 1);
+                    foreach (int nod in spurPath.nodesIDs)
                     {
                         potentialNodes.Add(nod);
                     }
 
-                    Path potential = new Path(potentialNodes, this);
+                    Path potential = new Path(potentialNodes, netAux);
                     B.Add(potential);
-                    netAux = new Network(mn);
+                    netAux = new Network(this);
                 }
 
                 if (B.Count == 0)
                     break;
-                
+
+                B.Sort();
+                A.Add(B[0]);
+                B.RemoveAt(0);
+                for (int q = 0; q < B.Count;q++)
+                {
+                    if (Math.Abs(A[A.Count - 1].totalCost - B[q].totalCost) < 0.00001)
+                    {
+                        A.Add(B[q]);
+                        B.RemoveAt(q);
+                    }
+                    else
+                        break;
+                }
+
+                if(A.Count == K)
+                {
+                    return A;
+                }
             }
-
-
             return A;
-            
         }
 
-        //methods just for clones of Network
 
+
+        //Method A: Delete links from a network with specific IDS
         public void delete_link_by_nodes_id(int tailNodeID, int headNodeID)
         {
             for (int i = 0; i < links.Count;i++)
@@ -276,5 +352,40 @@ namespace RouteBuilder
             }
         }
 
+        //Method B: Delete node by ID
+		public void delete_node_by_id(int NodeID)
+		{
+			for (int i = 0; i < nodes.Count; i++)
+			{
+                if (nodes[i].ID == NodeID)
+				{
+                    delete_links_that_contains_node(NodeID); 
+					nodes.RemoveAt(i);
+				}
+			}
+		}
+
+        //Method C: Delete links that contains the specific node
+        public void delete_links_that_contains_node(int NodeID)
+        {
+			for (int i = 0; i < links.Count; i++)
+			{
+                if (links[i].tailNode.ID == NodeID)
+				{
+                    nodeByID(links[i].headNode.ID).delete_innerLink(NodeID, links[i].headNode.ID);
+					nodeByID(links[i].tailNode.ID).delete_outerLink(NodeID, links[i].headNode.ID);
+					links.RemoveAt(i);
+                    i--;
+				}
+
+				else if (links[i].headNode.ID == NodeID)
+				{
+                    nodeByID(links[i].headNode.ID).delete_innerLink(links[i].tailNode.ID, NodeID);
+					nodeByID(links[i].tailNode.ID).delete_outerLink(links[i].tailNode.ID, NodeID);
+					links.RemoveAt(i);
+                    i--;
+				}
+			}  
+        }
     }
 }

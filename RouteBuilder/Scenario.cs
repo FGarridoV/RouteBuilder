@@ -5,9 +5,10 @@ namespace RouteBuilder
 {
     public class Scenario
     {
-
+        //Class elements
         List<Vehicle> vehicles;
 
+        //Constructor
         public Scenario(DetectionsDB dets, Network net, double timeNewTravel, double timePeriod)
         {
             vehicles = new List<Vehicle>();
@@ -29,6 +30,7 @@ namespace RouteBuilder
             add_times_to_nodes_and_links(net,timePeriod);
         }
 
+        //Method 1: Determine if is it a new mac
         public bool new_MAC(int mac)
         {
             foreach(Vehicle v in vehicles)
@@ -41,6 +43,7 @@ namespace RouteBuilder
             return true;
         }
 
+        //Method 2: Add a detection by MAC
         public void add_detection_by_mac(Detection d)
         {
             foreach(Vehicle v in vehicles)
@@ -52,6 +55,7 @@ namespace RouteBuilder
             }
         }
 
+        //Method 3: Add travels to all vehicle
         public void add_travels_all_vehicles(double timeNewTravel)
         {
             foreach(Vehicle v in vehicles)
@@ -60,12 +64,7 @@ namespace RouteBuilder
             }
         }
 
-        //metodo de prueba
-        public void make_prediction(Network net, RealNetwork mn)
-        {
-            vehicles[0].add_inferedTravels(net,mn,1);
-        }
-
+        //INCOMPLETO
         public void add_times_to_nodes_and_links(Network net, double timePeriod)
         {
             foreach(Vehicle v in vehicles)
@@ -107,6 +106,12 @@ namespace RouteBuilder
                 }
             }
         }
+
+		//metodo de prueba
+		public void make_prediction(Network net, RealNetwork mn)
+		{
+			vehicles[0].add_inferedTravels(net, 2);
+		}
 
 
 

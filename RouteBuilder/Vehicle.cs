@@ -5,11 +5,13 @@ namespace RouteBuilder
 {
     public class Vehicle
     {
+        //Class elements
         public int MAC;
         public List<Detection> allDetections;
         public List<Travel> travels;
         public List<List<int>> inferedTravels;
 
+        //Constructor
         public Vehicle(int MAC)
         {
             this.MAC = MAC;
@@ -18,21 +20,25 @@ namespace RouteBuilder
             this.inferedTravels = new List<List<int>>();
         }
 
+        //Method 1: Add a new travel to this vehicle
         public void add_new_travel(Travel t)
         {
             travels.Add(t);
         }
 
-		public void add_new_detection(Detection d)
+		//Method 2: Add a new detection to this vehicle
+        public void add_new_detection(Detection d)
 		{
             allDetections.Add(d);
 		}
 
+        //Method 3: Sort detections by occur (time)
         public void sort_Detections()
         {
             allDetections.Sort();
         }
 
+        //Method 4: Create all travels of a vehicle
         public void generate_travels(double timeNewTravel)
         {
             sort_Detections();
@@ -70,7 +76,8 @@ namespace RouteBuilder
             }
         }
 
-        public void add_inferedTravels(Network net, RealNetwork mn, int k)
+        //Add all inferedTravels by a travel
+        public void add_inferedTravels(Network net, int k)
         {
             foreach(Travel t in travels)
             {
@@ -92,9 +99,9 @@ namespace RouteBuilder
 
                         else
                         {
-                            //net.set_angularCosts(t.detections[i].BSID);
-                            Options paths = new Options(net,mn,infTravel[infTravel.Count - 1],t.detections[i].BSID,k);
-                            //Generar set de rutas entre los nodos
+                            net.set_angularCosts(t.detections[i].BSID);
+                            Options paths = new Options(net,infTravel[infTravel.Count - 1],t.detections[i].BSID,k);
+
                         }
                     }
                 }

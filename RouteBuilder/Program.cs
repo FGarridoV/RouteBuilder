@@ -28,9 +28,8 @@ namespace RouteBuilder
             Console.WriteLine("Model network created");
 
             Scenario sc = new Scenario(DB,modelNet, newTravelTime,timePeriod);
-            Console.WriteLine("Dwell times and travel times loaded");
+            Console.WriteLine("Dwell times, travel times and vehicle travels loaded");
 
-            sc.make_prediction(modelNet, mn);
 
 
             //Asignar tiempos de permanencia a los nodos

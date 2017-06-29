@@ -5,15 +5,11 @@ namespace RouteBuilder
 {
     public class RealNetwork
     {
+        //Class elements
         public List<RealNode> nodes;
         public List<RealLink> links;
 
-        public RealNetwork(List<RealNode> nodes, List<RealLink> links)
-        {
-            this.nodes = new List<RealNode>(nodes);
-            this.links = new List<RealLink>(links);
-        }
-
+        //Constructor to create a RealNetwork
         public RealNetwork(List<int[]> nodeInfo, List<int[]> LinkInfo)
         {
             this.nodes = new List<RealNode>();
@@ -39,6 +35,14 @@ namespace RouteBuilder
             }
         }
 
+		//Constructor to tranform real to model
+		public RealNetwork(List<RealNode> nodes, List<RealLink> links)
+		{
+			this.nodes = new List<RealNode>(nodes);
+			this.links = new List<RealLink>(links);
+		}
+
+        //Method 1: Create a model network in a real interface
         public RealNetwork real_to_model()
         {
             List<RealNode> newNodes = new List<RealNode>();
@@ -70,6 +74,7 @@ namespace RouteBuilder
             return model;
         }
 
+        //Method 2: Generate the new links
         public List<int> search_new_links(RealNode n)
         {
             List<int> headNodes = new List<int>();
@@ -89,6 +94,7 @@ namespace RouteBuilder
             return headNodes;
         }
 
+        //Method 3: Determinate de minimal distance 
         public double dijkstraDist(int nodeID1, int nodeID2)
         {
             List<RealNode> DijkNodes = new List<RealNode>(nodes);
@@ -124,6 +130,7 @@ namespace RouteBuilder
 
         }
 
+        //Method 4: Determinate the minamal number of nodes
 		public double dijkstraNodes(int nodeID1, int nodeID2)
 		{
 			List<RealNode> DijkNodes = new List<RealNode>(nodes);
@@ -159,6 +166,7 @@ namespace RouteBuilder
 
 		}
 
+        //Method 5: calculate the position of the minimal node
         public int minPos(List<RealNode> list)
         {
             double min = list[0].get_dijkstraTag();
@@ -174,6 +182,7 @@ namespace RouteBuilder
             return resp;
         }
 
+        //Method 6: Set data of dijkstras
         public void set_DijkstraData(RealNetwork RealNet)
         {
             foreach(RealLink l in this.links)

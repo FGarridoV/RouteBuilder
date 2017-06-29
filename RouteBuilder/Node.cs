@@ -5,7 +5,8 @@ namespace RouteBuilder
 {
     public class Node
     {
-		public int ID;
+		//Class elements
+        public int ID;
 		public List<Link> innerLinks;
 		public List<Link> outerLinks;
 		public double x;
@@ -14,6 +15,7 @@ namespace RouteBuilder
         public double cTAG;
         public int pTAG;
 
+        //Constructor from RealNode
         public Node(RealNode n)
         {
             this.ID = n.ID;
@@ -24,17 +26,32 @@ namespace RouteBuilder
             this.dTimes = new List<DwellTimes>();
         }
 
+        //Constructor to make copies
+        public Node(Node n)
+        {
+			this.ID = n.ID;
+            this.x = n.x;
+            this.y = n.y;
+            this.cTAG = n.cTAG;
+            this.pTAG = n.pTAG;
+			this.dTimes = new List<DwellTimes>();
+			this.innerLinks = new List<Link>();
+			this.outerLinks = new List<Link>();
+        }
+
+        //Method 1: Add a innerlink to node 
         public void add_innerLink(Link l)
         {
             innerLinks.Add(l);
         }
 
+        //Method 2: Add a outerlink to node
 		public void add_outerLink(Link l)
 		{
 			outerLinks.Add(l);
 		}
 
-
+        //Method 3: Returns the node in the specified position
         public static Node pos_node_by_ID(int ID, List<Node>nodeList)
         {
             int i = 0;
@@ -50,6 +67,7 @@ namespace RouteBuilder
             return nodeList[resp];
         }
 
+        //Method 4: Set a time at the period specified
         public void set_dwell_time_at_period(int period, double time)
         {
             if (exist_period(period))
@@ -69,6 +87,7 @@ namespace RouteBuilder
             
         }
 
+        //Method 5: Indicates if the periods exist
         public bool exist_period(int period)
         {
             foreach(DwellTimes d in dTimes)
@@ -80,7 +99,7 @@ namespace RouteBuilder
             return false;
         }
 
-		//methods just for clones of Network
+		//Method A: Delete the innerlink with the ID
 		public void delete_innerLink(int tailNodeID, int headNodeID)
 		{
             for (int i = 0; i < innerLinks.Count; i++)
@@ -92,6 +111,7 @@ namespace RouteBuilder
 			}
 		}
 
+        //Method B: Delete the outerlink with the ID
 		public void delete_outerLink(int tailNodeID, int headNodeID)
 		{
 			for (int i = 0; i < outerLinks.Count; i++)

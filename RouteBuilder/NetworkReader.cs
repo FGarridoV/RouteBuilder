@@ -6,11 +6,13 @@ namespace RouteBuilder
 {
     public class NetworkReader
     {
+        //Class elements
         public int nNodes; 
         public int nLinks;
         public List<int[]> nodesInfo;
         public List<int[]> linksInfo;
 
+        //Constructor
         public NetworkReader(string nodeFileName, string linkFileName)
         {
             try
@@ -32,6 +34,7 @@ namespace RouteBuilder
             
         }
 
+        //Method 1: Read the nodes caracteristics
         public List<int[]> nodeStr_to_list(string str)
         {
             string[] nodesStr = str.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -47,6 +50,7 @@ namespace RouteBuilder
             return nodesData;
         }
 
+        //Method 2: Read the link caracteristics
 		public List<int[]> LinkStr_to_list(string str)
 		{
             string[] linksStr = str.Split(new string[] { "\r\n", "\n" },StringSplitOptions.RemoveEmptyEntries);

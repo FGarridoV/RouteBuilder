@@ -5,6 +5,7 @@ namespace RouteBuilder
 {
     public class RealNode
     {
+        //Class elements
         public int ID;
         public List<RealLink> innerLinks;
         public List<RealLink> outerLinks;
@@ -12,6 +13,7 @@ namespace RouteBuilder
         public bool hasSensor;
         double dijkstraTag;
 
+        //Constructor with info
         public RealNode(int ID, double posX, double posY)
         {
             this.ID = ID;
@@ -21,6 +23,7 @@ namespace RouteBuilder
             hasSensor = false;
         }
 
+        //Constructor with another node
         public RealNode(RealNode node)
         {
             this.ID = node.ID;
@@ -30,27 +33,32 @@ namespace RouteBuilder
             this.hasSensor = node.hasSensor;
         }
 
+        //Method 1: set a sensor to node 
         public void set_sensor()
         {
             this.hasSensor = true;
         }
 
+        //Method 2: add an innerlink
         public void add_innerLink(RealLink l)
         {
             innerLinks.Add(l);
         }
 
+		//Method 3: add an outerlink
 		public void add_outerLink(RealLink l)
 		{
 			outerLinks.Add(l);
 		}
 
-        public double[] get_position()
+		//Method 4: returns the position
+		public double[] get_position()
         {
             return position;
         }
 
-        public static RealNode node_by_ID(List<RealNode> list, int ID)
+		//Method 5: return a node by ID
+		public static RealNode node_by_ID(List<RealNode> list, int ID)
         {
             foreach(RealNode n in list)
             {
@@ -60,12 +68,14 @@ namespace RouteBuilder
             return null;
         }
 
-        public void set_dijkstraTag(double distance)
+		//Method 6: assing a dijkstra tag
+		public void set_dijkstraTag(double distance)
         {
             this.dijkstraTag = distance;      
         }
 
-        public double get_dijkstraTag()
+		//Method 7: obtain a dijkstra tag
+		public double get_dijkstraTag()
         {
             return this.dijkstraTag;
         }

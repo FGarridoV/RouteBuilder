@@ -5,9 +5,10 @@ namespace RouteBuilder
 {
     public class DetectionsDB
     {
-
+        //Class elements
         public List<Detection> detections;
 
+        //Constructor
         public DetectionsDB(List<double[]> BTData)
         {
             detections = new List<Detection>();
@@ -19,5 +20,6 @@ namespace RouteBuilder
             }
         }
 
+        //Agregar método para usar cierto tipo de datos (algunas antenas)
     }
 }
