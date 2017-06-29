@@ -76,35 +76,12 @@ namespace RouteBuilder
             }
         }
 
-        //Add all inferedTravels by a travel
-        public void add_inferedTravels(Network net, int k)
+        //Method 5: Add all options to each travel
+        public void add_TravelOptions(Network net, int k)
         {
             foreach(Travel t in travels)
             {
-                List<int> infTravel = new List<int>();
-                infTravel.Add(t.detections[0].BSID);
-                for (int i = 1; i < t.detections.Count - 1; i++)
-                {
-                    if (infTravel[infTravel.Count-1] == t.detections[i].BSID)
-                    {
-                        continue;
-                    }
-
-                    else
-                    {
-                        if (net.Can_I_go_in_one_link(infTravel[infTravel.Count - 1], t.detections[i].BSID))
-                        {
-                            infTravel.Add(t.detections[i].BSID);
-                        }
-
-                        else
-                        {
-                            net.set_angularCosts(t.detections[i].BSID);
-                            Options paths = new Options(net,infTravel[infTravel.Count - 1],t.detections[i].BSID,k);
-
-                        }
-                    }
-                }
+                t.add_sections(net,k);
             }
             
         }

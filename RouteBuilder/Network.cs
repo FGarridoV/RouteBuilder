@@ -157,12 +157,6 @@ namespace RouteBuilder
                     break;
                 }
 
-                if(allNodes[pos].outerLinks.Count==0)
-                {
-					return null; 
-                }
-
-
                 allNodes.RemoveAt(pos);
 
                 foreach(Link l in PermNodes[PermNodes.Count-1].outerLinks)
@@ -191,10 +185,12 @@ namespace RouteBuilder
             bool a = true;
             while (a)
             {
+                int ver = 0;
                 foreach (Node n in nList)
                 {
                     if (n.ID == nods[nods.Count - 1])
                     {
+                        ver=1;
                         if(n.pTAG==-1)
                         {
                             a = false;
@@ -205,6 +201,9 @@ namespace RouteBuilder
                         break;
                     }
                 }
+                if (ver == 0)
+                    return null;
+
             }
             nods.Reverse();
             Path ans = new Path(nods, this);

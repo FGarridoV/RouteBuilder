@@ -9,6 +9,7 @@ namespace RouteBuilder
             //Definitions (in seconds)
             double newTravelTime = 30 * 60;
             double timePeriod = 20 * 60;
+            int k = 2;
 
             Console.WriteLine("Welcome to Route Builder by Tygger Inc.");
 
@@ -27,8 +28,8 @@ namespace RouteBuilder
             Network modelNet = new Network(mn);
             Console.WriteLine("Model network created");
 
-            Scenario sc = new Scenario(DB,modelNet, newTravelTime,timePeriod);
-            Console.WriteLine("Dwell times, travel times and vehicle travels loaded");
+            Scenario sc = new Scenario(DB,modelNet, newTravelTime,timePeriod,k);
+            Console.WriteLine("Dwell times, travel times and vehicle travels with options loaded");
 
 
 

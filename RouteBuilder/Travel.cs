@@ -8,12 +8,14 @@ namespace RouteBuilder
         //Class elements
         public List<Detection> detections;
         public List<int> passingNodes;
+        public List<Options> sections;
 
         //Constructor
         public Travel()
         {
             detections = new List<Detection>();
             passingNodes = new List<int>();
+            sections = new List<Options>();
         }
 
         //Method 1: Add a detection
@@ -44,6 +46,33 @@ namespace RouteBuilder
                     passingNodes.Add(detections[i].BSID);
                 }
             }
+        }
+
+        //Method 4: Add de sections of paths 
+        public void add_sections(Network net, int k)
+        {
+            for (int i = 0; i < detections.Count - 1; i++)
+			{
+                if (detections[i].BSID==detections[i+1].BSID)
+				{
+					continue;
+				}
+
+				else
+				{
+                    if (net.Can_I_go_in_one_link(detections[i].BSID,detections[i+1].BSID))
+					{
+                        Options opt = new Options(net, detections[i].BSID, detections[i + 1].BSID, detections[i].time, detections[i + 1].time);
+                        sections.Add(opt);
+					}
+
+					else
+					{
+						Options opt = new Options(net, detections[i].BSID, detections[i + 1].BSID,k,detections[i].time, detections[i + 1].time);
+						sections.Add(opt);
+					}
+				}
+			}
         }
     }
 }
