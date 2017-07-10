@@ -305,7 +305,7 @@ namespace RouteBuilder
                         potentialNodes.Add(nod);
                     }
 
-                    Path potential = new Path(potentialNodes, netAux);
+                    Path potential = new Path(potentialNodes, this);
                     B.Add(potential);
                     netAux = new Network(this);
                 }

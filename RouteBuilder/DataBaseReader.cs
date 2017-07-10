@@ -21,7 +21,7 @@ namespace RouteBuilder
 
             catch
             {
-				Console.WriteLine("Error 0002: reading database file");
+				Console.WriteLine("Error 0002: reading database file ... " + System.DateTime.Now.ToString());
 				System.Environment.Exit(0);
             }
         }
@@ -32,11 +32,19 @@ namespace RouteBuilder
 			string[] dataStr = str.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 			List<double[]> data = new List<double[]>();
 
+            int i = 0;
+            int j = 10;
             foreach (string info in dataStr)
 			{
 				string[] auxData = info.Split(',');
 				double[] aux = new double[] { double.Parse(auxData[0]), double.Parse(auxData[1]), timeStr_to_double(auxData[2])};
 				data.Add(aux);
+                if(i==(int)((dataStr.Length-1)*j/100))
+                {
+                    Console.WriteLine("Loading database ... " + j + "%\t\t" + System.DateTime.Now.ToString());
+                    j += 10;
+                }
+                i++;
 			}
 			return data;
         }

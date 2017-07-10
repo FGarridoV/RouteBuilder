@@ -25,7 +25,6 @@ namespace RouteBuilder
                 if (i < nodesIDs.Count - 1)
                     links.Add(net.LinkByNodesID(nodesIDs[i], nodesIDs[i + 1]));
             }
-
             add_totalCost();
         }
 

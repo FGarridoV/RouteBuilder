@@ -7,12 +7,15 @@ namespace RouteBuilder
     {
         //Class elements
         List<Vehicle> vehicles;
+        //Network network;
 
         //Constructor
-        public Scenario(DetectionsDB dets, Network net, double timeNewTravel, double timePeriod, int k)
+        public Scenario(DetectionsDB dets)
         {
             vehicles = new List<Vehicle>();
 
+			int i = 0;
+			int j = 10;
             foreach (Detection d in dets.detections)
             {
                 if (new_MAC(d.MAC))
@@ -25,10 +28,14 @@ namespace RouteBuilder
                 {
                     add_detection_by_mac(d);
                 }
+                if (i == (int)((dets.detections.Count - 1) * j / 100))
+				{
+					Console.WriteLine("Creating vehicle entities ... " + j + "%\t" + System.DateTime.Now.ToString());
+					j += 10;
+				}
+				i++;
             }
-            add_travels_all_vehicles(timeNewTravel);
-            add_times_to_nodes_and_links(net,timePeriod);
-            add_options(net,k);
+            Console.WriteLine(vehicles.Count + " Vehicles created\t\t\t" + System.DateTime.Now.ToString());
         }
 
         //Method 1: Determine if is it a new mac
@@ -61,7 +68,7 @@ namespace RouteBuilder
         {
             foreach(Vehicle v in vehicles)
             {
-                v.generate_travels(timeNewTravel);
+                v.generate_trips(timeNewTravel);
             }
         }
 
@@ -70,7 +77,7 @@ namespace RouteBuilder
 		{
 			foreach (Vehicle v in vehicles)
 			{
-                v.add_TravelOptions(net,k);
+                v.add_tripOptions(net,k);
 			}
 		}
 
@@ -79,7 +86,7 @@ namespace RouteBuilder
         {
             foreach(Vehicle v in vehicles)
             {
-                foreach(Travel t in v.travels)
+                foreach(Trip t in v.trips)
                 {
                     for(int i = 0; i < t.detections.Count-1;i++)
                     {

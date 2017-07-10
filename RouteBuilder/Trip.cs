@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace RouteBuilder
 {
-    public class Travel
+    public class Trip
     {
         //Class elements
         public List<Detection> detections;
         public List<int> passingNodes;
-        public List<Options> sections;
+        public List<Section> sections;
 
         //Constructor
-        public Travel()
+        public Trip()
         {
             detections = new List<Detection>();
             passingNodes = new List<int>();
-            sections = new List<Options>();
+            sections = new List<Section>();
         }
 
         //Method 1: Add a detection
@@ -62,13 +62,13 @@ namespace RouteBuilder
 				{
                     if (net.Can_I_go_in_one_link(detections[i].BSID,detections[i+1].BSID))
 					{
-                        Options opt = new Options(net, detections[i].BSID, detections[i + 1].BSID, detections[i].time, detections[i + 1].time);
+                        Section opt = new Section(net, detections[i].BSID, detections[i + 1].BSID, detections[i].time, detections[i + 1].time);
                         sections.Add(opt);
 					}
 
 					else
 					{
-						Options opt = new Options(net, detections[i].BSID, detections[i + 1].BSID,k,detections[i].time, detections[i + 1].time);
+						Section opt = new Section(net, detections[i].BSID, detections[i + 1].BSID,k,detections[i].time, detections[i + 1].time);
 						sections.Add(opt);
 					}
 				}

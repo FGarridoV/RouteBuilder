@@ -9,8 +9,8 @@ namespace RouteBuilder
         //Class elements
         public int nNodes; 
         public int nLinks;
-        public List<int[]> nodesInfo;
-        public List<int[]> linksInfo;
+        public List<double[]> nodesInfo;
+        public List<double[]> linksInfo;
 
         //Constructor
         public NetworkReader(string nodeFileName, string linkFileName)
@@ -21,29 +21,29 @@ namespace RouteBuilder
                 StreamReader sr2 = new StreamReader(linkFileName);
                 this.nNodes = int.Parse(sr1.ReadLine());
                 this.nLinks = int.Parse(sr2.ReadLine());
-                this.nodesInfo = new List<int[]>(nodeStr_to_list(sr1.ReadToEnd()));
-                this.linksInfo = new List<int[]>(LinkStr_to_list(sr2.ReadToEnd()));
+                this.nodesInfo = new List<double[]>(nodeStr_to_list(sr1.ReadToEnd()));
+                this.linksInfo = new List<double[]>(LinkStr_to_list(sr2.ReadToEnd()));
                 sr1.Close();
                 sr2.Close();
             }
             catch
             {
-                Console.WriteLine("Error 0001: reading network file");
+                Console.WriteLine("Error 0001: reading network file ... " + System.DateTime.Now.ToString());
                 System.Environment.Exit(0);
             }
             
         }
 
         //Method 1: Read the nodes caracteristics
-        public List<int[]> nodeStr_to_list(string str)
+        public List<double[]> nodeStr_to_list(string str)
         {
             string[] nodesStr = str.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-            List<int[]> nodesData = new List<int[]>();
+            List<double[]> nodesData = new List<double[]>();
 
 			foreach (string node in nodesStr)
 			{
 				string[] auxStr = node.Split(',');
-                int[] aux = new int[] { int.Parse(auxStr[0]), int.Parse(auxStr[1]), int.Parse(auxStr[2]), int.Parse(auxStr[3])};
+                double[] aux = new double[] { int.Parse(auxStr[0]), double.Parse(auxStr[1],System.Globalization.CultureInfo.InvariantCulture), double.Parse(auxStr[2],System.Globalization.CultureInfo.InvariantCulture), int.Parse(auxStr[3])};
 				nodesData.Add(aux);
 			}
 
@@ -51,15 +51,15 @@ namespace RouteBuilder
         }
 
         //Method 2: Read the link caracteristics
-		public List<int[]> LinkStr_to_list(string str)
+		public List<double[]> LinkStr_to_list(string str)
 		{
             string[] linksStr = str.Split(new string[] { "\r\n", "\n" },StringSplitOptions.RemoveEmptyEntries);
-			List<int[]> linksData = new List<int[]>();
+			List<double[]> linksData = new List<double[]>();
 
 			foreach (string link in linksStr)
 			{
                 string[] auxStr = link.Split(',');
-                int[] aux = new int[] {int.Parse(auxStr[0]),int.Parse(auxStr[1]),int.Parse(auxStr[2]) };
+                double[] aux = new double[] {int.Parse(auxStr[0]),int.Parse(auxStr[1]),int.Parse(auxStr[2]) };
                 linksData.Add(aux);
 			}
 			return linksData;

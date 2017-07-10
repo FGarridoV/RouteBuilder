@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RouteBuilder
 {
-    public class Options
+    public class Section
     {
         //Class elements
         List<Path> paths;
@@ -11,7 +11,7 @@ namespace RouteBuilder
         double timeEnd;
 
         //Constructor without inference
-        public Options(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd)
+        public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd)
         {
             this.paths = new List<Path>();
             List<int> nodesID = new List<int>();
@@ -24,7 +24,7 @@ namespace RouteBuilder
         }
 
         //Constructor for inference
-        public Options(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd)
+        public Section(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd)
         {
             this.paths = new List<Path>();
 

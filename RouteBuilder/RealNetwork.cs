@@ -10,28 +10,28 @@ namespace RouteBuilder
         public List<RealLink> links;
 
         //Constructor to create a RealNetwork
-        public RealNetwork(List<int[]> nodeInfo, List<int[]> LinkInfo)
+        public RealNetwork(List<double[]> nodeInfo, List<double[]> LinkInfo)
         {
             this.nodes = new List<RealNode>();
             this.links = new List<RealLink>();
 
-            foreach(int[] dat in nodeInfo)
+            foreach(double[] dat in nodeInfo)
             {
-                RealNode aux = new RealNode(dat[0],dat[1],dat[2]);
-                if(dat[3]==1)
+                RealNode aux = new RealNode((int) dat[0],dat[1],dat[2]);
+                if((int)dat[3]==1)
                 {
                     aux.set_sensor();
                 }
                 nodes.Add(aux);
             }
 
-            foreach(int[] dat in LinkInfo)
+            foreach(double[] dat in LinkInfo)
             {
-                RealLink aux = new RealLink(dat[0], nodes[dat[1]], nodes[dat[2]]);
+                RealLink aux = new RealLink((int)dat[0], RealNode.node_by_ID(nodes,(int)dat[1]), RealNode.node_by_ID(nodes, (int)dat[2]));
                 links.Add(aux);
 
-                nodes[dat[1]].add_outerLink(aux);
-                nodes[dat[2]].add_innerLink(aux);
+                RealNode.node_by_ID(nodes, (int)dat[1]).add_outerLink(aux);
+                RealNode.node_by_ID(nodes, (int)dat[2]).add_innerLink(aux);
             }
         }
 
@@ -194,5 +194,17 @@ namespace RouteBuilder
             }
         }
 
+        public List<int> BTS_id()
+        {
+            List<int> BTS = new List<int>();
+            foreach(RealNode n in nodes)
+            {
+                if(n.hasSensor)
+                {
+                    BTS.Add(n.ID);
+                }
+            }
+            return BTS;
+        }
     }
 }

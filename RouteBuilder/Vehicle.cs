@@ -8,22 +8,22 @@ namespace RouteBuilder
         //Class elements
         public int MAC;
         public List<Detection> allDetections;
-        public List<Travel> travels;
-        public List<List<int>> inferedTravels;
+        public List<Trip> trips;
+        public List<List<int>> inferedTrips;
 
         //Constructor
         public Vehicle(int MAC)
         {
             this.MAC = MAC;
             this.allDetections = new List<Detection>();
-            this.travels = new List<Travel>();
-            this.inferedTravels = new List<List<int>>();
+            this.trips = new List<Trip>();
+            this.inferedTrips = new List<List<int>>();
         }
 
-        //Method 1: Add a new travel to this vehicle
-        public void add_new_travel(Travel t)
+        //Method 1: Add a new trip to this vehicle
+        public void add_new_trip(Trip t)
         {
-            travels.Add(t);
+            trips.Add(t);
         }
 
 		//Method 2: Add a new detection to this vehicle
@@ -38,48 +38,48 @@ namespace RouteBuilder
             allDetections.Sort();
         }
 
-        //Method 4: Create all travels of a vehicle
-        public void generate_travels(double timeNewTravel)
+        //Method 4: Create all trips of a vehicle
+        public void generate_trips(double timeNewtrip)
         {
             sort_Detections();
-            Travel t0 = new Travel();
+            Trip t0 = new Trip();
             t0.add_detection(allDetections[0]);
 
             for (int i = 0; i < allDetections.Count;i++)
             {
                 if(i==0)
                 {
-                    Travel t = new Travel();
-                    travels.Add(t);
-                    travels[travels.Count-1].add_detection(allDetections[i]);
+                    Trip t = new Trip();
+                    trips.Add(t);
+                    trips[trips.Count-1].add_detection(allDetections[i]);
                 }
 
                 else
                 {
-                    if(allDetections[i].time - travels[travels.Count-1].get_last_time() < timeNewTravel)
+                    if(allDetections[i].time - trips[trips.Count-1].get_last_time() < timeNewtrip)
                     {
-                        travels[travels.Count - 1].add_detection(allDetections[i]);
+                        trips[trips.Count - 1].add_detection(allDetections[i]);
                     }
 
                     else
                     {
-                        Travel t = new Travel();
-                        travels.Add(t);
-                        travels[travels.Count - 1].add_detection(allDetections[i]);
+                        Trip t = new Trip();
+                        trips.Add(t);
+                        trips[trips.Count - 1].add_detection(allDetections[i]);
                     }
                 }
             }
 
-            foreach(Travel t in travels)
+            foreach(Trip t in trips)
             {
                 t.generate_passingNodes();
             }
         }
 
-        //Method 5: Add all options to each travel
-        public void add_TravelOptions(Network net, int k)
+        //Method 5: Add all options to each trip
+        public void add_tripOptions(Network net, int k)
         {
-            foreach(Travel t in travels)
+            foreach(Trip t in trips)
             {
                 t.add_sections(net,k);
             }

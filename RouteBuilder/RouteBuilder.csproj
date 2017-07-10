@@ -42,14 +42,15 @@
     <Compile Include="RealNode.cs" />
     <Compile Include="RealLink.cs" />
     <Compile Include="Path.cs" />
-    <Compile Include="Options.cs" />
+    <Compile Include="Section.cs" />
     <Compile Include="Vehicle.cs" />
     <Compile Include="Detection.cs" />
     <Compile Include="DetectionsDB.cs" />
     <Compile Include="Scenario.cs" />
-    <Compile Include="Travel.cs" />
+    <Compile Include="Trip.cs" />
     <Compile Include="DwellTimes.cs" />
     <Compile Include="TravelTimes.cs" />
+    <Compile Include="Experiment.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

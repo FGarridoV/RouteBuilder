@@ -20,6 +20,19 @@ namespace RouteBuilder
             }
         }
 
-        //Agregar método para usar cierto tipo de datos (algunas antenas)
+        public DetectionsDB(List<double[]> BTData, List<int> BTS)
+        {
+			detections = new List<Detection>();
+
+            foreach (double[] i in BTData)
+            {
+                if (BTS.Contains((int)i[0]))
+                {
+                    Detection aux = new Detection((int)i[0], (int)i[1], i[2]);
+                    detections.Add(aux);
+                }
+            }
+        }
+
     }
 }
