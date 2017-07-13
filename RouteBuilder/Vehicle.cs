@@ -42,8 +42,6 @@ namespace RouteBuilder
         public void generate_trips(double timeNewtrip)
         {
             sort_Detections();
-            Trip t0 = new Trip();
-            t0.add_detection(allDetections[0]);
 
             for (int i = 0; i < allDetections.Count;i++)
             {
@@ -56,7 +54,7 @@ namespace RouteBuilder
 
                 else
                 {
-                    if(allDetections[i].time - trips[trips.Count-1].get_last_time() < timeNewtrip)
+                    if(allDetections[i].time - trips[trips.Count-1].get_last_time() <= timeNewtrip)
                     {
                         trips[trips.Count - 1].add_detection(allDetections[i]);
                     }
@@ -77,11 +75,11 @@ namespace RouteBuilder
         }
 
         //Method 5: Add all options to each trip
-        public void add_tripOptions(Network net, int k)
+        public void add_tripOptions(Network net, int k, double T)
         {
             foreach(Trip t in trips)
             {
-                t.add_sections(net,k);
+                t.add_sections(net,k, T);
             }
             
         }

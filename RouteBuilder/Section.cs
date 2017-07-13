@@ -9,9 +9,10 @@ namespace RouteBuilder
         List<Path> paths;
         double timeStart;
         double timeEnd;
+        double period;
 
         //Constructor without inference
-        public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd)
+        public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd, double T)
         {
             this.paths = new List<Path>();
             List<int> nodesID = new List<int>();
@@ -21,10 +22,11 @@ namespace RouteBuilder
             paths.Add(p);
             this.timeStart = timeStart;
             this.timeEnd = timeEnd;
+            this.period = (int)Math.Ceiling(timeStart / T);
         }
 
         //Constructor for inference
-        public Section(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd)
+        public Section(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd, double T)
         {
             this.paths = new List<Path>();
 
@@ -57,6 +59,7 @@ namespace RouteBuilder
 
 			this.timeStart = timeStart;
 			this.timeEnd = timeEnd;
+            this.period = (int)Math.Ceiling(timeStart / T);
         }
 
         //Method 1: Return true if the path doesnt exist

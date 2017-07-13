@@ -51,6 +51,7 @@
     <Compile Include="DwellTimes.cs" />
     <Compile Include="TravelTimes.cs" />
     <Compile Include="Experiment.cs" />
+    <Compile Include="Histogram.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

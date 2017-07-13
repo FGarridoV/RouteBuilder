@@ -14,7 +14,7 @@ namespace RouteBuilder
             //probar todas las combinaciones
         }
 
-        public Experiment(RealNetwork rn, DataBaseReader ddb, double newTravelTime, double T, int k)
+        public Experiment(RealNetwork rn, DataBaseReader ddb, double newTravelTime, double timeNewVisit, double T, int k)
         {
             nBTsensor = rn.BTS_id().Count;
             scenarios = new List<Scenario>();
@@ -31,10 +31,13 @@ namespace RouteBuilder
 			Console.WriteLine("New scenario created" + "\t\t\t" + System.DateTime.Now.ToString());
 			sc.add_travels_all_vehicles(newTravelTime);
 			Console.WriteLine("Vehicle trips assigned" + "\t\t\t" + System.DateTime.Now.ToString());
-			sc.add_times_to_nodes_and_links(modelNet, T);
+			sc.add_times_to_nodes_and_links(modelNet, T, timeNewVisit);
 			Console.WriteLine("Dwell and travel times loaded" + "\t\t" + System.DateTime.Now.ToString());
-			sc.add_options(modelNet, k);
+			sc.add_options(modelNet, k, T);
 			Console.WriteLine("Sections of all vehicle determinated" + "\t" +System.DateTime.Now.ToString());
+            //modelNet.export_data();
+            Console.WriteLine("\a");
+
 
         }
     }

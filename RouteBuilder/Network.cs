@@ -386,5 +386,36 @@ namespace RouteBuilder
 				}
 			}  
         }
+
+        public void export_data()
+        {
+            StreamWriter sw1 = new StreamWriter("dwellTimes.txt");
+            StreamWriter sw2 = new StreamWriter("travelTimes.txt");
+
+            foreach(Node n in nodes)
+            {
+                foreach(DwellTimes dt in n.dTimes)
+                {
+                    foreach(double t in dt.times)
+                    {
+                        sw1.WriteLine(n.ID + ", " + dt.ID_period + ", " + t);
+                    }
+                }
+            }
+            sw1.Close();
+
+            foreach(Link l in links)
+            {
+                foreach (TravelTimes tt in l.tTimes)
+				{
+					foreach (double t in tt.times)
+					{
+						sw2.WriteLine(l.ID + ", " + tt.ID_period + ", " + t);
+					}
+				} 
+            }
+            sw2.Close();
+
+        }
     }
 }

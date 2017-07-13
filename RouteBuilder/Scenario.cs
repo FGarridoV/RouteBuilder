@@ -64,25 +64,25 @@ namespace RouteBuilder
         }
 
         //Method 3: Add travels to all vehicle
-        public void add_travels_all_vehicles(double timeNewTravel)
+        public void add_travels_all_vehicles(double NewTripTime)
         {
             foreach(Vehicle v in vehicles)
             {
-                v.generate_trips(timeNewTravel);
+                v.generate_trips(NewTripTime);
             }
         }
 
 		//Method 4: Add options to all vehicles
-		public void add_options(Network net, int k)
+		public void add_options(Network net, int k, double T)
 		{
 			foreach (Vehicle v in vehicles)
 			{
-                v.add_tripOptions(net,k);
+                v.add_tripOptions(net,k, T);
 			}
 		}
 
         //Method 5: Add times to the network
-        public void add_times_to_nodes_and_links(Network net, double timePeriod)
+        public void add_times_to_nodes_and_links(Network net, double T, double timeNewVisit)
         {
             foreach(Vehicle v in vehicles)
             {
@@ -95,7 +95,7 @@ namespace RouteBuilder
                             int end = i + 1;
                             for(int j = i + 2; j < t.detections.Count;j++)
                             {
-                                if(t.detections[i].BSID == t.detections[j].BSID)
+                                if(t.detections[i].BSID == t.detections[j].BSID && t.detections[j].time - t.detections[j-1].time < timeNewVisit)
                                 {
                                     end = j;
                                 }
@@ -105,7 +105,7 @@ namespace RouteBuilder
                                 }
                             }
                             double dTimeAux = t.detections[end].time - t.detections[i].time;
-                            int period = (int)Math.Ceiling(t.detections[i].time / timePeriod);
+                            int period = (int)Math.Ceiling(t.detections[i].time / T);
                             net.nodeByID(t.detections[i].BSID).set_dwell_time_at_period(period,dTimeAux);
                             i = end-1;
                         }
@@ -115,7 +115,7 @@ namespace RouteBuilder
                             if(net.Can_I_go_in_one_link(t.detections[i].BSID,t.detections[i + 1].BSID))
                             {
                                 double tTimeAux = t.detections[i + 1].time - t.detections[i].time;
-                                int period = (int)Math.Ceiling(t.detections[i].time / timePeriod);
+                                int period = (int)Math.Ceiling(t.detections[i].time / T);
                                 net.LinkByNodesID(t.detections[i].BSID,t.detections[i+1].BSID).set_travel_time_at_period(period,tTimeAux);
                             }
                         }

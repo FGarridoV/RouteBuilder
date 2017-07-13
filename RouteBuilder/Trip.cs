@@ -49,7 +49,7 @@ namespace RouteBuilder
         }
 
         //Method 4: Add de sections of paths 
-        public void add_sections(Network net, int k)
+        public void add_sections(Network net, int k, double T)
         {
             for (int i = 0; i < detections.Count - 1; i++)
 			{
@@ -62,13 +62,13 @@ namespace RouteBuilder
 				{
                     if (net.Can_I_go_in_one_link(detections[i].BSID,detections[i+1].BSID))
 					{
-                        Section opt = new Section(net, detections[i].BSID, detections[i + 1].BSID, detections[i].time, detections[i + 1].time);
+                        Section opt = new Section(net, detections[i].BSID, detections[i + 1].BSID, detections[i].time, detections[i + 1].time, T);
                         sections.Add(opt);
 					}
 
 					else
 					{
-						Section opt = new Section(net, detections[i].BSID, detections[i + 1].BSID,k,detections[i].time, detections[i + 1].time);
+						Section opt = new Section(net, detections[i].BSID, detections[i + 1].BSID,k,detections[i].time, detections[i + 1].time, T);
 						sections.Add(opt);
 					}
 				}

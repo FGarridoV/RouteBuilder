@@ -7,7 +7,8 @@ namespace RouteBuilder
         public static void Main(string[] args)
         {
             //Definitions (in seconds)
-            double newTravelTime = 30 * 60;
+            double newTripTime = 30 * 60;
+            double newVisitTime = 3 * 60;
             double T = 20 * 60;
             int k = 2;
 
@@ -25,7 +26,7 @@ namespace RouteBuilder
             if (rn.BTS_id().Count>0)
             {
                 Console.WriteLine("Starting a single experiment" +"\t\t" + System.DateTime.Now.ToString());
-                Experiment exp = new Experiment(rn, dbr, newTravelTime, T, k);
+                Experiment exp = new Experiment(rn, dbr, newTripTime, newVisitTime, T, k);
             }
 
             else
