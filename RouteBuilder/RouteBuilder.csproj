@@ -52,6 +52,7 @@
     <Compile Include="TravelTimes.cs" />
     <Compile Include="Experiment.cs" />
     <Compile Include="Histogram.cs" />
+    <Compile Include="Route.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

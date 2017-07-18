@@ -12,6 +12,7 @@ namespace RouteBuilder
         public List<double> exitTimePassingNodes;
         public List<double> countsOnPassingNodes;
         public List<Section> sections;
+        public List<Route> routes;
 
         //Constructor
         public Trip()
@@ -22,6 +23,7 @@ namespace RouteBuilder
             exitTimePassingNodes = new List<double>(); 
             sections = new List<Section>();
             countsOnPassingNodes = new List<double>();
+            routes = new List<Route>();
         }
 
         //Method 1: Add a detection
@@ -113,6 +115,73 @@ namespace RouteBuilder
 					}
 				}
 			}
+        }
+
+        public void create_Routes(int MAC)
+        {
+            if (MAC == 364)
+            {
+                
+            }
+            List<List<int>> finalRoutes = new List<List<int>>();
+            List<double> Ps = new List<double>();
+            List<int> r0 = new List<int>();
+            double p0 = 1;
+            finalRoutes.Add(r0);
+            Ps.Add(p0);
+            for (int i = 0; i < sections.Count;i++)
+            {
+                if (sections[i].paths.Count == 1)
+                {
+                    foreach (List<int> r in finalRoutes)
+                    {
+                        r.AddRange(sections[i].paths[sections[i].paths.Count - 1].nodesIDs);
+                        if (i != sections.Count-1)
+                            r.RemoveAt(r.Count - 1);
+                    }
+                }
+                else if (sections[i].paths.Count > 1)
+                {
+                    List<List<int>> AUX = new List<List<int>>();
+                    List<double> pAUX = new List<double>();
+                    int n = sections[i].paths.Count;
+                    for (int j = 0; j < n;j++)
+                    {
+                        List<List<int>> aux = new List<List<int>>();
+                        foreach (List<int> l in finalRoutes)
+                        {
+                            List<int> auxiliar = new List<int>(l);
+                            aux.Add(auxiliar);
+                        }
+                        List<double> paux = new List<double>(Ps);
+                        int k = 0;
+                        foreach(List<int> r in aux)
+                        {
+                            r.AddRange(sections[i].paths[j].nodesIDs);
+                            paux[k] = paux[k] * sections[i].paths[j].finalProb;
+							if (i != sections.Count - 1)
+								r.RemoveAt(r.Count - 1);
+                            k++;
+						}
+                        AUX.AddRange(aux);
+                        pAUX.AddRange(paux);
+                    }
+                    finalRoutes = new List<List<int>>();
+					foreach (List<int> l in AUX)
+					{
+						List<int> auxiliar = new List<int>(l);
+                        finalRoutes.Add(auxiliar);
+					}
+                    Ps = new List<double>(pAUX);
+                }
+            }
+
+            for (int i = 0; i < finalRoutes.Count;i++)
+            {
+                Route aux = new Route(MAC, finalRoutes[i], Ps[i]);
+                routes.Add(aux);
+            }
+
         }
     }
 }

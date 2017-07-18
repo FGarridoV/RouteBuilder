@@ -36,8 +36,11 @@ namespace RouteBuilder
 			sc.add_options(modelNet, k, T);
 			Console.WriteLine("Sections of all vehicle determinated" + "\t" +System.DateTime.Now.ToString());
             sc.apply_methodology();
-			Console.WriteLine("End" + "\t" + System.DateTime.Now.ToString());
-			Console.WriteLine("\a");
+			Console.WriteLine("Bayesian probabilities calculated" + "\t" + System.DateTime.Now.ToString());
+			sc.assing_routes();
+			Console.WriteLine("All vehicle routes infered" + "\t\t" + System.DateTime.Now.ToString());
+            sc.export_inference_vehicles();
+            Console.WriteLine("\a");
 
 
         }

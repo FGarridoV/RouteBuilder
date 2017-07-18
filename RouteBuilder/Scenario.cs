@@ -271,5 +271,35 @@ namespace RouteBuilder
                 }
             }
         }
+
+        public void assing_routes()
+        {
+            foreach (Vehicle v in vehicles)
+            {
+                foreach (Trip t in v.trips)
+                {
+                    t.create_Routes(v.MAC);
+                }
+            }
+        }
+
+        public void export_inference_vehicles()
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Trip t in v.trips)
+                {
+                    if(t.routes.Count>1)
+                    {
+                        Console.WriteLine("---------- " + v.MAC + " ----------");
+                        foreach(Route r in t.routes)
+                        {
+                            Console.WriteLine("Route: " + r.export_route());
+                        }
+                        Console.WriteLine("----------" + "---" + "----------");
+                    }
+                }
+            }
+        }
     }
 }
