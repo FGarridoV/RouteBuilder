@@ -27,7 +27,7 @@ namespace RouteBuilder
 			Network modelNet = new Network(mn);
 			Console.WriteLine("Model network created" +"\t\t\t"+ System.DateTime.Now.ToString());
 
-			Scenario sc = new Scenario(DB);
+			Scenario sc = new Scenario(DB,T);
 			Console.WriteLine("New scenario created" + "\t\t\t" + System.DateTime.Now.ToString());
 			sc.add_travels_all_vehicles(newTravelTime);
 			Console.WriteLine("Vehicle trips assigned" + "\t\t\t" + System.DateTime.Now.ToString());
@@ -35,8 +35,9 @@ namespace RouteBuilder
 			Console.WriteLine("Dwell and travel times loaded" + "\t\t" + System.DateTime.Now.ToString());
 			sc.add_options(modelNet, k, T);
 			Console.WriteLine("Sections of all vehicle determinated" + "\t" +System.DateTime.Now.ToString());
-            //modelNet.export_data();
-            Console.WriteLine("\a");
+            sc.apply_methodology();
+			Console.WriteLine("End" + "\t" + System.DateTime.Now.ToString());
+			Console.WriteLine("\a");
 
 
         }

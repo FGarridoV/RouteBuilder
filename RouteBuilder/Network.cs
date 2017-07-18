@@ -387,6 +387,25 @@ namespace RouteBuilder
 			}  
         }
 
+        public void set_BinsRange()
+        {
+            foreach(Node n in nodes)
+            {
+                foreach(DwellTimes dt in n.dTimes)
+                {
+                    dt.set_optimalA();
+                }
+            }
+
+			foreach (Link l in links)
+			{
+				foreach (TravelTimes tt in l.tTimes)
+				{
+					tt.set_optimalA();
+				}
+			}
+        }
+
         public void export_data()
         {
             StreamWriter sw1 = new StreamWriter("dwellTimes.txt");

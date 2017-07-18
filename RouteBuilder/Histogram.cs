@@ -93,7 +93,7 @@ namespace RouteBuilder
             int s = this.total_data();
             foreach(double[] d in this.data)
             {
-                double[] values = new double[] {d[0],d[1],d[2]/s};
+                double[] values = new double[] {d[0],d[1],d[2]/(s*a)};
                 h.data.Add(values);
             }
             return h;
@@ -109,35 +109,95 @@ namespace RouteBuilder
             return (int)sum;
         }
 
-        public double getVal(double t)
+        public double getVal(double val)
         {
-            int interval = bin_pos(t);
-
-            if (interval < 0)
+            if (val <= 0)
                 return 0;
-
-            else if (interval > nBins)
+            else if (val > this.data[data.Count-1][1])
                 return 0;
-
             else
-                return data[interval][2];
+                return this.data[bin_pos(val)][2];
+            
         }
 
         public static Histogram convolution(Histogram h1, Histogram h2)
         {
             Histogram convolved = new Histogram(h1, h2, h1.a);
-
-            for (int i = 0; i < convolved.data.Count; i++)
-			{
-                double val = 0;
-                for (int m = 0; m < convolved.data.Count;m++)
+            List<double> boundValues = new List<double>();
+            boundValues.Add(0);
+            double n = 1;
+            foreach(double[] boundVal in convolved.data)
+            {
+                double evalf = 0;
+                double k = 0;
+                foreach(double[] bounds in convolved.data)
                 {
-                    val = val + h1.getVal(m) * h2.getVal(i - m);
+                    double nF = (k * convolved.a + (k + 1) * convolved.a)/2;
+                    double nG = ((n - k - 1) * convolved.a + (n - k) * convolved.a) / 2;
+                    evalf += h1.getVal(nF) * h2.getVal(nG) * convolved.a;
+                    k++;
                 }
-                convolved.data[i][2] = val;
-			}
+                boundValues.Add(evalf);
+                n++;
+            }
+
+            for (int i = 0; i < convolved.data.Count;i++)
+            {
+                convolved.data[i][2]=(boundValues[i]+boundValues[i+1])/2;
+            }
+
             return convolved;
         }
+
+        public static Histogram multi_convolution(List <Histogram> Hs)
+        {
+            Histogram ConvAux = convolution(Hs[0], Hs[1]);
+
+            for (int i = 2; i < Hs.Count-1;i++)
+            {
+                ConvAux = convolution(ConvAux, Hs[i]);
+            }
+
+            return ConvAux;
+        }
+
+        public double get_mean()
+        {
+            double sum = 0;
+            for (int i = 0; i < this.data.Count;i++)
+            {
+                sum += (Math.Pow(this.a,2)/2)*this.data[i][2] * (2 * i - 1);
+            }
+            return sum;
+        }
+
+        public double integral(double fromVal, double toValue)
+        {
+            int startBin = bin_pos(fromVal);
+            int endBin = bin_pos(toValue);
+            double area = 0;
+            if (startBin == endBin)
+            {
+                return this.data[startBin][2] * (toValue - fromVal);
+            }
+            for (int i = startBin; i <= endBin; i++)
+            {
+                if(i==startBin)
+                {
+                    area += (this.data[i][1] - fromVal) * this.data[i][2];
+                }
+                else if(i==endBin)
+                {
+                    area += (toValue - this.data[i][0]) * this.data[i][2];
+                }
+                else
+                {
+                    area += this.a * this.data[i][2];
+                }
+            }
+            return area;
+        }
+
 
         public void export(string name)
         {
@@ -148,6 +208,7 @@ namespace RouteBuilder
             }
             sw.Close();
         }
+
 
     }
 }

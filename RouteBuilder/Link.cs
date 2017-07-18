@@ -77,6 +77,16 @@ namespace RouteBuilder
 			return false;
 		}
 
+		//Method 5: Return the times of specific period
+		public TravelTimes tt_at_specific_period(int period)
+		{
+			foreach (TravelTimes tt in tTimes)
+			{
+				if (tt.ID_period == period)
+					return tt;
+			}
+			return null;
+		}
 
     }
 }

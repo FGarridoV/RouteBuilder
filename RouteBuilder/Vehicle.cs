@@ -9,7 +9,6 @@ namespace RouteBuilder
         public int MAC;
         public List<Detection> allDetections;
         public List<Trip> trips;
-        public List<List<int>> inferedTrips;
 
         //Constructor
         public Vehicle(int MAC)
@@ -17,7 +16,6 @@ namespace RouteBuilder
             this.MAC = MAC;
             this.allDetections = new List<Detection>();
             this.trips = new List<Trip>();
-            this.inferedTrips = new List<List<int>>();
         }
 
         //Method 1: Add a new trip to this vehicle

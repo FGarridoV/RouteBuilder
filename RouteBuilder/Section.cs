@@ -6,13 +6,13 @@ namespace RouteBuilder
     public class Section
     {
         //Class elements
-        List<Path> paths;
-        double timeStart;
-        double timeEnd;
-        double period;
+        public List<Path> paths;
+        public double timeStart;
+        public double timeEnd;
+        public int period;
 
         //Constructor without inference
-        public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd, double T)
+        public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd, double T, int sCount, int eCount)
         {
             this.paths = new List<Path>();
             List<int> nodesID = new List<int>();
@@ -23,10 +23,16 @@ namespace RouteBuilder
             this.timeStart = timeStart;
             this.timeEnd = timeEnd;
             this.period = (int)Math.Ceiling(timeStart / T);
+
+			foreach (Path pa in paths)
+			{
+				pa.set_startNodeCount(sCount);
+				pa.set_endNodeCount(eCount);
+			}
         }
 
         //Constructor for inference
-        public Section(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd, double T)
+        public Section(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd, double T, int sCount, int eCount)
         {
             this.paths = new List<Path>();
 
@@ -60,6 +66,12 @@ namespace RouteBuilder
 			this.timeStart = timeStart;
 			this.timeEnd = timeEnd;
             this.period = (int)Math.Ceiling(timeStart / T);
+
+            foreach(Path p in paths)
+            {
+                p.set_startNodeCount(sCount);
+                p.set_endNodeCount(eCount);
+            }
         }
 
         //Method 1: Return true if the path doesnt exist
@@ -74,5 +86,65 @@ namespace RouteBuilder
             }
             return true;
         }
+
+        public void set_P_ttt_to_paths()
+        {
+            foreach(Path p in paths)
+            {
+                p.set_P_ttt(timeEnd - timeStart, this.period);
+            }
+        }
+
+        public void set_P_md_to_paths()
+        {
+			foreach (Path p in paths)
+			{
+				p.set_P_md(timeEnd - timeStart);
+			}
+        }
+
+        public void set_P_ru_to_paths(Scenario sc)
+        {
+            double totalFlow = 0;
+            foreach (Path p in paths)
+			{
+                p.set_fs(sc,period);
+                totalFlow += p.meanF;
+			}
+
+			foreach (Path p in paths)
+			{
+                p.set_P_ru(p.meanF/totalFlow);
+			}
+        }
+
+        public void apply_BayesianInference(Scenario sc)
+        {
+            set_P_ttt_to_paths();
+            set_P_md_to_paths();
+            set_P_ru_to_paths(sc);
+
+            double totalProb = 0;
+            foreach(Path p in paths)
+            {
+                totalProb += p.P_routeUses * p.P_totalTravelTime * p.P_missedDetections;
+            }
+
+			foreach (Path p in paths)
+			{
+                p.set_final_prob(p.P_routeUses * p.P_totalTravelTime * p.P_missedDetections/totalProb);
+			}
+        }
+
+        public void apply_ObiouslyInference()
+        {
+			foreach (Path p in paths)
+			{
+				p.set_final_prob(1);
+			}
+        }
+
+
+
     }
 }

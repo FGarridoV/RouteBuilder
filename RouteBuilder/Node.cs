@@ -5,11 +5,11 @@ namespace RouteBuilder
 {
     public class Node
     {
-		//Class elements
+        //Class elements
         public int ID;
-		public List<Link> innerLinks;
-		public List<Link> outerLinks;
-		public double x;
+        public List<Link> innerLinks;
+        public List<Link> outerLinks;
+        public double x;
         public double y;
         public List<DwellTimes> dTimes;
         public double cTAG;
@@ -29,14 +29,14 @@ namespace RouteBuilder
         //Constructor to make copies
         public Node(Node n)
         {
-			this.ID = n.ID;
+            this.ID = n.ID;
             this.x = n.x;
             this.y = n.y;
             this.cTAG = n.cTAG;
             this.pTAG = n.pTAG;
-			this.dTimes = new List<DwellTimes>();
-			this.innerLinks = new List<Link>();
-			this.outerLinks = new List<Link>();
+            this.dTimes = new List<DwellTimes>();
+            this.innerLinks = new List<Link>();
+            this.outerLinks = new List<Link>();
         }
 
         //Method 1: Add a innerlink to node 
@@ -46,13 +46,13 @@ namespace RouteBuilder
         }
 
         //Method 2: Add a outerlink to node
-		public void add_outerLink(Link l)
-		{
-			outerLinks.Add(l);
-		}
+        public void add_outerLink(Link l)
+        {
+            outerLinks.Add(l);
+        }
 
         //Method 3: Returns the node in the specified position
-        public static Node pos_node_by_ID(int ID, List<Node>nodeList)
+        public static Node pos_node_by_ID(int ID, List<Node> nodeList)
         {
             int i = 0;
             int resp = 0;
@@ -72,7 +72,7 @@ namespace RouteBuilder
         {
             if (exist_period(period))
             {
-                foreach(DwellTimes d in dTimes)
+                foreach (DwellTimes d in dTimes)
                 {
                     if (d.ID_period == period)
                         d.add_dTime(time);
@@ -84,13 +84,13 @@ namespace RouteBuilder
                 dts.add_dTime(time);
                 dTimes.Add(dts);
             }
-            
+
         }
 
         //Method 5: Indicates if the periods exist
         public bool exist_period(int period)
         {
-            foreach(DwellTimes d in dTimes)
+            foreach (DwellTimes d in dTimes)
             {
                 if (d.ID_period == period)
                     return true;
@@ -98,6 +98,17 @@ namespace RouteBuilder
 
             return false;
         }
+
+		//Method 5: Return the times of specific period
+		public DwellTimes dt_at_specific_period(int period)
+		{
+			foreach (DwellTimes dt in dTimes)
+			{
+                if (dt.ID_period == period)
+                    return dt;
+			}
+            return null;
+		}
 
 		//Method A: Delete the innerlink with the ID
 		public void delete_innerLink(int tailNodeID, int headNodeID)
