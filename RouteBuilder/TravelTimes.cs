@@ -7,7 +7,9 @@ namespace RouteBuilder
     {
         //Class elements
         public int ID_period;
+        public double optimalA;
         public List<double> times;
+
 
         //Constructor
         public TravelTimes(int ID_period)
@@ -35,6 +37,14 @@ namespace RouteBuilder
 			times.Sort();
 			times.Reverse();
 			return times[0];
+		}
+
+		//Method 4: Dtermines the optimal binRange
+		public void set_optimalA()
+		{
+			double dataRange = this.max_value() - this.min_value();
+			int nbins = (int)Math.Floor(Math.Sqrt(dataRange));
+			this.optimalA = dataRange / nbins;
 		}
     }
 }
