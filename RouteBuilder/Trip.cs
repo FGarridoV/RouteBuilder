@@ -119,10 +119,7 @@ namespace RouteBuilder
 
         public void create_Routes(int MAC)
         {
-            if (MAC == 364)
-            {
-                
-            }
+
             List<List<int>> finalRoutes = new List<List<int>>();
             List<double> Ps = new List<double>();
             List<int> r0 = new List<int>();
