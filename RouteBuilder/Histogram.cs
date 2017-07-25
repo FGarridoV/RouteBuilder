@@ -166,13 +166,18 @@ namespace RouteBuilder
             double sum = 0;
             for (int i = 0; i < this.data.Count;i++)
             {
-                sum += (Math.Pow(this.a,2)/2)*this.data[i][2] * (2 * i - 1);
+                sum += (Math.Pow(this.a,2)/2)*this.data[i][2] * (2 * i + 1);
             }
             return sum;
         }
 
         public double integral(double fromVal, double toValue)
         {
+            //corregir cuando esta fuera
+            if (fromVal > this.data[this.data.Count - 1][1])
+                return 0;
+            if (toValue > this.data[this.data.Count - 1][1])
+                toValue = this.data[this.data.Count - 1][1];
             int startBin = bin_pos(fromVal);
             int endBin = bin_pos(toValue);
             double area = 0;

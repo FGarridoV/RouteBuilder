@@ -180,5 +180,21 @@ namespace RouteBuilder
             }
 
         }
+
+        public Route get_mostProbably()
+        {
+            double max = 0;
+            int maxPos = 0;
+            for (int i = 0; i < routes.Count;i++)
+            {
+                if (routes[i].prob > max)
+                {
+                    max = routes[i].prob;
+                    maxPos = i;
+                }
+            }
+
+            return routes[maxPos];
+        }
     }
 }

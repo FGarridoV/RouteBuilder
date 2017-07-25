@@ -6,7 +6,7 @@ namespace RouteBuilder
     public class Scenario
     {
         //Class elements
-        List<Vehicle> vehicles;
+        public List<Vehicle> vehicles;
         public double T;
         //Network network;
 
@@ -173,7 +173,7 @@ namespace RouteBuilder
                             foreach (Path p in s.paths)
                             {
                                 Console.WriteLine("-----Paths-----");
-                                double[] a = get_DB_k_and_v(p, 1, 20 * 60, 23);
+                                double[] a = get_DB_k_and_v2(p, 1, 20 * 60, 23);
                                 Console.WriteLine("existen " + a[0] + "a una vel " + a[1]*3.6);
                                 foreach (int n in p.nodesIDs)
                                 {
@@ -188,6 +188,52 @@ namespace RouteBuilder
                 //Console.WriteLine(total_inferences);
             }
 
+        }
+
+        public double[] get_DB_k_and_v2(Path p, int k, double T, int period)
+        {
+            int total = 0;
+            double sumSpeeds = 0;
+            int ver = 0;
+            int start = 0;
+            int end = 0;
+
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Trip t in v.trips)
+                {
+                    for (int i = 0; i < t.passingNodes.Count; i++)
+                    {
+                        if (period == (int)Math.Ceiling(t.enterTimePassingNodes[i] / T))
+                        {
+                            if(t.passingNodes[i]==p.nodesIDs[0])
+                            {
+                                ver++;
+                                start = i;
+                                for (int j = i + 1; j < t.passingNodes.Count && j-i<p.nodesIDs.Count;j++)
+                                {
+                                    if (t.passingNodes[j] == p.nodesIDs[j - i])
+                                    {
+                                        ver++;
+                                        end = j;
+                                    }
+                                }
+                                if (ver == p.nodesIDs.Count)
+                                {
+                                    total++;
+                                    sumSpeeds += p.distance / (t.enterTimePassingNodes[end] - t.exitTimePassingNodes[start]);
+                                }
+                                ver = 0;
+                            }
+                        }
+                    }                    
+                }
+            }
+            if (total == 0)
+                return new double[] { 0, 0};
+                
+			double[] data = new double[] { total, sumSpeeds / total };
+			return data;
         }
 
         public double[] get_DB_k_and_v(Path p, int k, double T, int period)
@@ -262,6 +308,10 @@ namespace RouteBuilder
                     {
                         if (s.paths.Count >= 2)
                         {
+                            if(v.MAC==6284)
+                            {
+                                
+                            }
                             s.apply_BayesianInference(this);
                         }
 
@@ -283,8 +333,10 @@ namespace RouteBuilder
             }
         }
 
-        public void export_inference_vehicles()
+        public void export_inference_vehicles(Experiment exp)
         {
+            int exitos = 0;
+            int fracasos = 0;
             foreach(Vehicle v in vehicles)
             {
                 foreach(Trip t in v.trips)
@@ -296,10 +348,22 @@ namespace RouteBuilder
                         {
                             Console.WriteLine("Route: " + r.export_route());
                         }
+                        Console.WriteLine(exp.get_realRoute(v.MAC));
+                        if (Route.Comparer(t.get_mostProbably(), exp.export_in_route(v.MAC)))
+                        {
+                            Console.WriteLine("SUCCESS");
+                            exitos++;
+                        }
+                        else
+                        {
+                            Console.WriteLine("FAIL");
+                            fracasos++;
+                        }
                         Console.WriteLine("----------" + "---" + "----------");
                     }
                 }
             }
+            Console.WriteLine("Program ended, RATIO: " + (exitos/(double)(exitos + fracasos)*100) + "%   Total is: "+(exitos + fracasos));
         }
     }
 }

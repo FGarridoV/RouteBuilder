@@ -267,18 +267,21 @@ namespace RouteBuilder
             Path p0 = netAux.dijkstra(sourceNodeID, sinkNodeID);
             A.Add(p0);
 
-            for (int k = 1; k <= K; k++)
+            for (int k = 1; k < K; k++)
             {
-                for (int i = 0; i < A[k - 1].nodesIDs.Count - 1; i++)
+                for (int i = 0; i < A[k - 1].nodesIDs.Count-1; i++)
                 {
                     int spurNode = A[k - 1].nodesIDs[i];
                     List<int> rootPath = A[k - 1].some_nodes(0, i);
 
                     foreach (Path p in A)
                     {
-                        if (Path.areEquals(rootPath, p.some_nodes(0, i)))
+                        if (i<p.nodesIDs.Count)
                         {
-                            netAux.delete_link_by_nodes_id(p.nodesIDs[i], p.nodesIDs[i + 1]);
+                            if (Path.areEquals(rootPath, p.some_nodes(0, i)))
+                            {
+                                netAux.delete_link_by_nodes_id(p.nodesIDs[i], p.nodesIDs[i + 1]);
+                            }
                         }
                     }
 

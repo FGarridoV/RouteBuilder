@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 
 namespace RouteBuilder
 {
@@ -23,10 +23,25 @@ namespace RouteBuilder
             RealNetwork rn = new RealNetwork(nr.nodesInfo,nr.linksInfo);
             Console.WriteLine("Real network created" +"\t\t\t" + System.DateTime.Now.ToString());
 
+			/////BORRAR//////
+			DataBaseReader dbrREAL = new DataBaseReader("AllBT.txt");
+			Console.WriteLine("Database REAL loaded" + "\t\t\t\t" + System.DateTime.Now.ToString());
+			RealNetwork rnREAL = new RealNetwork(nr.nodesInfo, nr.linksInfo);
+			Console.WriteLine("Real network created" + "\t\t\t" + System.DateTime.Now.ToString());
+            /////////////////
+
             if (rn.BTS_id().Count>0)
             {
                 Console.WriteLine("Starting a single experiment" +"\t\t" + System.DateTime.Now.ToString());
                 Experiment exp = new Experiment(rn, dbr, newTripTime, newVisitTime, T, k);
+                ////BORRAR/////
+				Console.WriteLine("Starting a single experiment" + "\t\t" + System.DateTime.Now.ToString());
+				Experiment expREAL = new Experiment(rnREAL, dbrREAL, newTripTime, newVisitTime, T, k);
+                ///////////////
+                /// 
+                ///
+
+                exp.scenarios[0].export_inference_vehicles(expREAL);
             }
 
             else
@@ -34,16 +49,8 @@ namespace RouteBuilder
                 //Acá se prueban todos los expériments
             }
 
-
-
-            //Para cdada dato determinar P
-
-            //generar ruta
-
-            //convertir a red real
-
-            //mostrar
-
+			//TRUCHERIA
+			
 
         }
     }

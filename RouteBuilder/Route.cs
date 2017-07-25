@@ -5,8 +5,8 @@ namespace RouteBuilder
     public class Route
     {
 		int MAC;
-		List<int> nodes;
-		double prob;
+		public List<int> nodes;
+		public double prob;
 
         public Route(int MAC, List<int> nodes, double prob)
         {
@@ -14,6 +14,8 @@ namespace RouteBuilder
             this.prob = prob;
             this.nodes = new List<int>(nodes); 
         }
+
+       
 
         public string export_route()
         {
@@ -33,6 +35,25 @@ namespace RouteBuilder
             }
 
             return text;
+        }
+        /////BORRAR///
+        public static bool Comparer(Route r1, Route r2)
+        {
+            if(r1.nodes.Count==r2.nodes.Count)
+            {
+                for (int i = 0; i < r1.nodes.Count;i++)
+                {
+                    if (r1.nodes[i] == r2.nodes[i])
+                        continue;
+                    else
+                        return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
