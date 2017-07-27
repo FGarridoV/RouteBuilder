@@ -33,7 +33,9 @@ namespace RouteBuilder
 			List<double[]> data = new List<double[]>();
 
             int i = 0;
-            int j = 10;
+            int j = 5;
+            Console.WriteLine("\t\t\t0%\t50%\t100%");
+            Console.Write("Loading database...\t");
             foreach (string info in dataStr)
 			{
 				string[] auxData = info.Split(',');
@@ -41,8 +43,14 @@ namespace RouteBuilder
 				data.Add(aux);
                 if(i==(int)((dataStr.Length-1)*j/100))
                 {
-                    Console.WriteLine("Loading database ... " + j + "%\t\t" + System.DateTime.Now.ToString());
-                    j += 10;
+                    if (j == 100)
+                        Console.WriteLine("\u2588\t" + System.DateTime.Now.ToString());//"\u25A0");
+
+                    else
+                    {
+                        Console.Write("\u2588");
+                        j += 5;
+                    }
                 }
                 i++;
 			}

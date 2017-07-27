@@ -6,21 +6,45 @@ namespace RouteBuilder
     public class Scenario
     {
         //Class elements
+        public Network network;
         public List<Vehicle> vehicles;
         public double T;
-        //Network network;
+        public double newTripTime;
+        public double newVisitTime;
+        public int K;
+        public Network rNetwork;
+        public List<Vehicle> rVehicles;
 
         //Constructor
-        public Scenario(DetectionsDB dets, double T)
+        public Scenario(Network net, DetectionsDB dets, DetectionsDB rDets, double T, double newTripTime, double newVisitTime, int K)
         {
-            vehicles = new List<Vehicle>();
             this.T = T;
+            this.newTripTime = newTripTime;
+            this.newVisitTime = newVisitTime;
+            this.K = K;
 
-			int i = 0;
-			int j = 10;
+            network = new Network(net);
+            rNetwork = new Network(net);
+
+            vehicles = new List<Vehicle>();
+            create_vehicles(dets, vehicles);
+
+            rVehicles = new List<Vehicle>();
+            create_vehicles(rDets, rVehicles);
+
+            Console.WriteLine("Vehicles created: " + vehicles.Count + "\t\t\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("Real vehicles: " + rVehicles.Count + "\t\t\t\t" + System.DateTime.Now.ToString());
+        }
+
+        public void create_vehicles(DetectionsDB dets, List<Vehicle> vehicles)
+        {
+            int i = 0;
+            int j = 5;
+            Console.WriteLine("\t\t\t0%\t50%\t100%");
+            Console.Write("Creating vehicles...\t");
             foreach (Detection d in dets.detections)
             {
-                if (new_MAC(d.MAC))
+                if (new_MAC(d.MAC,vehicles))
                 {
                     Vehicle aux = new Vehicle(d.MAC);
                     aux.add_new_detection(d);
@@ -28,20 +52,25 @@ namespace RouteBuilder
                 }
                 else
                 {
-                    add_detection_by_mac(d);
+                    add_detection_by_mac(d, vehicles);
                 }
                 if (i == (int)((dets.detections.Count - 1) * j / 100))
-				{
-					Console.WriteLine("Creating vehicle entities ... " + j + "%\t" + System.DateTime.Now.ToString());
-					j += 10;
-				}
-				i++;
+                {
+                    if (j == 100)
+                        Console.WriteLine("\u2588\t" + System.DateTime.Now.ToString());//"\u25A0");
+
+                    else
+                    {
+                        Console.Write("\u2588");
+                        j += 5;
+                    }
+                }
+                i++;
             }
-            Console.WriteLine(vehicles.Count + " Vehicles created\t\t\t" + System.DateTime.Now.ToString());
         }
 
         //Method 1: Determine if is it a new mac
-        public bool new_MAC(int mac)
+        public bool new_MAC(int mac, List<Vehicle> vehicles)
         {
             foreach(Vehicle v in vehicles)
             {
@@ -54,11 +83,11 @@ namespace RouteBuilder
         }
 
         //Method 2: Add a detection by MAC
-        public void add_detection_by_mac(Detection d)
+        public void add_detection_by_mac(Detection d, List<Vehicle> vehicles)
         {
-            foreach(Vehicle v in vehicles)
+            foreach (Vehicle v in vehicles)
             {
-                if(d.MAC == v.MAC)
+                if (d.MAC == v.MAC)
                 {
                     v.add_new_detection(d);
                 }
@@ -66,25 +95,43 @@ namespace RouteBuilder
         }
 
         //Method 3: Add travels to all vehicle
-        public void add_travels_all_vehicles(double NewTripTime)
+        public void add_travels_all_vehicles()
         {
             foreach(Vehicle v in vehicles)
             {
-                v.generate_trips(NewTripTime);
+                v.generate_trips(newTripTime);
             }
         }
 
+		//Method 3a: Add travels to all real vehicle
+		public void add_travels_all_rVehicles()
+		{
+			foreach (Vehicle v in rVehicles)
+			{
+				v.generate_trips(newTripTime);
+			}
+		}
+
 		//Method 4: Add options to all vehicles
-		public void add_options(Network net, int k, double T)
+		public void add_options()
 		{
 			foreach (Vehicle v in vehicles)
 			{
-                v.add_tripOptions(net,k, T);
+                v.add_tripOptions(network ,K, T);
+			}
+		}
+
+		//Method 4a: Add options to all vehicles
+		public void add_rOptions()
+		{
+			foreach (Vehicle v in rVehicles)
+			{
+				v.add_tripOptions(rNetwork, 1, T);
 			}
 		}
 
         //Method 5: Add times to the network
-        public void add_times_to_nodes_and_links(Network net, double T, double timeNewVisit)
+        public void add_times_to_nodes_and_links()
         {
             foreach(Vehicle v in vehicles)
             {
@@ -94,14 +141,14 @@ namespace RouteBuilder
                     {
                         if(t.detections[i].BSID==t.detections[i+1].BSID)
                         {
-                            if(t.detections[i+1].time - t.detections[i].time>timeNewVisit)
+                            if(t.detections[i+1].time - t.detections[i].time>newVisitTime)
                             {
                                 continue;
                             }
                             int end = i + 1;
                             for(int j = i + 2; j < t.detections.Count;j++)
                             {
-                                if(t.detections[i].BSID == t.detections[j].BSID && t.detections[j].time - t.detections[j-1].time <= timeNewVisit)
+                                if(t.detections[i].BSID == t.detections[j].BSID && t.detections[j].time - t.detections[j-1].time <= newVisitTime)
                                 {
                                     end = j;
                                 }
@@ -112,23 +159,23 @@ namespace RouteBuilder
                             }
                             double dTimeAux = t.detections[end].time - t.detections[i].time;
                             int period = (int)Math.Ceiling(t.detections[i].time / T);
-                            net.nodeByID(t.detections[i].BSID).set_dwell_time_at_period(period,dTimeAux);
+                            network.nodeByID(t.detections[i].BSID).set_dwell_time_at_period(period,dTimeAux);
                             i = end-1;
                         }
 
                         else
                         {
-                            if(net.Can_I_go_in_one_link(t.detections[i].BSID,t.detections[i + 1].BSID))
+                            if(network.Can_I_go_in_one_link(t.detections[i].BSID,t.detections[i + 1].BSID))
                             {
                                 double tTimeAux = t.detections[i + 1].time - t.detections[i].time;
                                 int period = (int)Math.Ceiling(t.detections[i].time / T);
-                                net.LinkByNodesID(t.detections[i].BSID,t.detections[i+1].BSID).set_travel_time_at_period(period,tTimeAux);
+                                network.LinkByNodesID(t.detections[i].BSID,t.detections[i+1].BSID).set_travel_time_at_period(period,tTimeAux);
                             }
                         }
                     }
                 }
             }
-			net.set_BinsRange();
+			network.set_BinsRange();
         }
 
         public void NumberVehicles()
@@ -173,7 +220,7 @@ namespace RouteBuilder
                             foreach (Path p in s.paths)
                             {
                                 Console.WriteLine("-----Paths-----");
-                                double[] a = get_DB_k_and_v2(p, 1, 20 * 60, 23);
+                                double[] a = get_DB_k_and_vFull(p, 23);
                                 Console.WriteLine("existen " + a[0] + "a una vel " + a[1]*3.6);
                                 foreach (int n in p.nodesIDs)
                                 {
@@ -185,12 +232,11 @@ namespace RouteBuilder
                         }
                     }
                 }
-                //Console.WriteLine(total_inferences);
             }
 
         }
 
-        public double[] get_DB_k_and_v2(Path p, int k, double T, int period)
+        public double[] get_DB_k_and_vFull(Path p, int period)
         {
             int total = 0;
             double sumSpeeds = 0;
@@ -236,7 +282,7 @@ namespace RouteBuilder
 			return data;
         }
 
-        public double[] get_DB_k_and_v(Path p, int k, double T, int period)
+        public double[] get_DB_k_and_v(Path p, int r, int period)
         {
             int total = 0;
             double sumSpeeds = 0;
@@ -283,7 +329,7 @@ namespace RouteBuilder
                                         }
                                     }
                                 }
-                                if (detections == k)
+                                if (detections == r)
                                 {
                                     total++;
                                     sumSpeeds += p.distance/(t.enterTimePassingNodes[end]-t.exitTimePassingNodes[start]);
@@ -308,10 +354,6 @@ namespace RouteBuilder
                     {
                         if (s.paths.Count >= 2)
                         {
-                            if(v.MAC==6284)
-                            {
-                                
-                            }
                             s.apply_BayesianInference(this);
                         }
 
@@ -321,6 +363,20 @@ namespace RouteBuilder
                 }
             }
         }
+
+		public void apply_directions()
+		{
+			foreach (Vehicle v in rVehicles)
+			{
+				foreach (Trip t in v.trips)
+				{
+					foreach (Section s in t.sections)
+					{
+							s.apply_ObiouslyInference();
+					}
+				}
+			}
+		}
 
         public void assing_routes()
         {
@@ -333,7 +389,42 @@ namespace RouteBuilder
             }
         }
 
-        public void export_inference_vehicles(Experiment exp)
+		public void assing_rRoutes()
+		{
+			foreach (Vehicle v in rVehicles)
+			{
+				foreach (Trip t in v.trips)
+				{
+					t.create_Routes(v.MAC);
+				}
+			}
+		}
+
+		public string get_realRoute(int veh_mac)
+		{
+			foreach (Vehicle v in this.rVehicles)
+			{
+				if (v.MAC == veh_mac)
+				{
+					return v.trips[0].routes[0].export_route();
+				}
+			}
+			return null;
+		}
+
+		public Route export_in_route(int veh_mac)
+		{
+			foreach (Vehicle v in this.rVehicles)
+			{
+				if (v.MAC == veh_mac)
+				{
+					return v.trips[0].routes[0];
+				}
+			}
+			return null;
+		}
+
+        public void export_inference_vehicles()
         {
             int exitos = 0;
             int fracasos = 0;
@@ -348,8 +439,8 @@ namespace RouteBuilder
                         {
                             Console.WriteLine("Route: " + r.export_route());
                         }
-                        Console.WriteLine(exp.get_realRoute(v.MAC));
-                        if (Route.Comparer(t.get_mostProbably(), exp.export_in_route(v.MAC)))
+                        Console.WriteLine(get_realRoute(v.MAC));
+                        if (Route.Comparer(t.get_mostProbably(), export_in_route(v.MAC)))
                         {
                             Console.WriteLine("SUCCESS");
                             exitos++;

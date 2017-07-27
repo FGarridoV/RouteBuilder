@@ -198,7 +198,7 @@ namespace RouteBuilder
             double fs = 0;
             for (int k = 1; k <= n; k++)
             {
-                double[] DBkv = sc.get_DB_k_and_v2(this, k, sc.T, period);
+                double[] DBkv = sc.get_DB_k_and_vFull(this, period);
                 double combinatory = comb(n, k);
                 double pvk = Math.Pow(p_from_v(DBkv[1]), k);
                 double npvk = Math.Pow(1-p_from_v(DBkv[1]), n-k);
