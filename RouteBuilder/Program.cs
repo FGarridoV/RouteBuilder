@@ -9,8 +9,8 @@ namespace RouteBuilder
             //Definitions (in seconds)
             double newTripTime = 30 * 60;
             double newVisitTime = 3 * 60;
-            double T = 20 * 60;
-            int k = 4;
+            double T = 15 * 60;
+            int k = 10;
 
             Console.WriteLine("Welcome to Route Builder v0.0 by TyggerSoftware Inc.\n");
 

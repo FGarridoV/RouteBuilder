@@ -12,7 +12,6 @@ namespace RouteBuilder
         public double newTripTime;
         public double newVisitTime;
         public int K;
-        public Network rNetwork;
         public List<Vehicle> rVehicles;
 
         //Constructor
@@ -24,7 +23,6 @@ namespace RouteBuilder
             this.K = K;
 
             network = new Network(net);
-            rNetwork = new Network(net);
 
             vehicles = new List<Vehicle>();
             create_vehicles(dets, vehicles);
@@ -126,7 +124,7 @@ namespace RouteBuilder
 		{
 			foreach (Vehicle v in rVehicles)
 			{
-				v.add_tripOptions(rNetwork, 1, T);
+				v.add_tripOptions(network, 1, T);
 			}
 		}
 
@@ -399,6 +397,11 @@ namespace RouteBuilder
 				}
 			}
 		}
+
+       // public void  
+
+
+
 
 		public string get_realRoute(int veh_mac)
 		{
