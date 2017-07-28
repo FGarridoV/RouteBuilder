@@ -15,8 +15,6 @@ namespace RouteBuilder
             this.nodes = new List<int>(nodes); 
         }
 
-       
-
         public string export_route()
         {
             string text = "";

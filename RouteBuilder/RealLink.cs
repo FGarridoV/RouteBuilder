@@ -39,4 +39,5 @@ namespace RouteBuilder
 			this.dijkstraNodes = nodes;
 		}
     }
+
 }

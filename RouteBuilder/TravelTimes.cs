@@ -47,4 +47,5 @@ namespace RouteBuilder
 			this.optimalA = dataRange / nbins;
 		}
     }
+
 }

@@ -143,8 +143,5 @@ namespace RouteBuilder
 				p.set_final_prob(1);
 			}
         }
-
-
-
     }
 }
