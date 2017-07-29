@@ -72,6 +72,7 @@ namespace RouteBuilder
                 p.set_startNodeCount(sCount);
                 p.set_endNodeCount(eCount);
             }
+            this.set_repeats();
         }
 
         //Method 1: Return true if the path doesnt exist
@@ -103,12 +104,12 @@ namespace RouteBuilder
 			}
         }
 
-        public void set_P_ru_to_paths(Scenario sc)
+        public void set_P_ru_to_paths_old(Scenario sc)
         {
             double totalFlow = 0;
             foreach (Path p in paths)
 			{
-                p.set_fs(sc,period);
+                p.set_fs_old(sc,period);
                 totalFlow += p.meanF;
 			}
 
@@ -118,11 +119,11 @@ namespace RouteBuilder
 			}
         }
 
-        public void apply_BayesianInference(Scenario sc)
+        public void apply_BayesianInference_old(Scenario sc)
         {
             set_P_ttt_to_paths();
             set_P_md_to_paths();
-            set_P_ru_to_paths(sc);
+            set_P_ru_to_paths_old(sc);
 
             double totalProb = 0;
             foreach(Path p in paths)
@@ -142,6 +143,31 @@ namespace RouteBuilder
 			{
 				p.set_final_prob(1);
 			}
+        }
+
+        public void set_repeats()
+        {
+            foreach(Path p in paths)
+            {
+                for (int i = 0; i < p.nodesIDs.Count;i++)
+                {
+                    int counts = 0;
+                    if(i==0 || i == p.nodesIDs.Count - 1)
+                        counts = -1;
+                    else
+                    {
+						foreach (Path pa in paths)
+						{
+                            if (pa.has_node(p.nodesIDs[i]) == true)
+							{
+								counts++;
+							}
+						}
+                        counts--;
+                    }
+                    p.add_count_nodes_id(counts);
+                }
+            }
         }
     }
 }

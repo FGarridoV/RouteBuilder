@@ -88,6 +88,28 @@ namespace RouteBuilder
 			return null;
 		}
 
+        public void add_travelTimes(TravelTimes tt)
+        {
+            tTimes.Add(tt);
+        }
+
+        public double get_Vprom_at_period(int period)
+        {
+            double sumSpeed = 0;
+            TravelTimes aux = tt_at_specific_period(period);
+            foreach(double t in aux.times)
+            {
+                sumSpeed += distanceCost / t;
+            }
+
+            return sumSpeed / aux.times.Count;
+        }
+
+		public double get_Count_at_period(int period)
+		{
+            return tt_at_specific_period(period).times.Count;
+		}
+
     }
 
 }

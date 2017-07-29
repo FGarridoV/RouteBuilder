@@ -342,7 +342,7 @@ namespace RouteBuilder
             return data;
         }
 
-        public void apply_methodology()
+        public void apply_methodology_old()
         {
             foreach(Vehicle v in vehicles)
             {
@@ -352,7 +352,7 @@ namespace RouteBuilder
                     {
                         if (s.paths.Count >= 2)
                         {
-                            s.apply_BayesianInference(this);
+                            s.apply_BayesianInference_old(this);
                         }
 
                         else if (s.paths.Count == 1)
@@ -398,10 +398,148 @@ namespace RouteBuilder
 			}
 		}
 
-       // public void  
+        public double[] min_max_period_ID()
+        {
+            double minPeriodID = double.PositiveInfinity;
+            double maxPeriodID = 0;
 
+            foreach(Link l in network.links)
+            {
+                foreach(TravelTimes tt in l.tTimes)
+                {
+                    if (tt.ID_period > maxPeriodID)
+                        maxPeriodID = tt.ID_period;
+                    if (tt.ID_period < minPeriodID)
+                        minPeriodID = tt.ID_period;
+                }
+            }
+			foreach (Node n in network.nodes)
+			{
+				foreach (DwellTimes dt in n.dTimes)
+				{
+					if (dt.ID_period > maxPeriodID)
+						maxPeriodID = dt.ID_period;
+					if (dt.ID_period < minPeriodID)
+						minPeriodID = dt.ID_period;
+				}
+			}
 
+            return new double[] { minPeriodID, maxPeriodID };
+        }
 
+        public void times_corrector(double radious)
+        {
+            double[] minMax = min_max_period_ID();
+            int count = (int)(minMax[1] - minMax[0]);
+
+            foreach(Link l in network.links)
+            {
+                if(l.tTimes.Count<count)
+                {
+                    List<int> missingPeriods = new List<int>(periods_dont_present(l, minMax));
+                    foreach(int period in missingPeriods)
+                    {
+                        TravelTimes ttAux = new TravelTimes(period);
+
+                        double vProm = 0;
+                        double cProm = 0;
+                        foreach(Link l_v in l.tailNode.innerLinks)
+                        {
+                            vProm += l_v.get_Vprom_at_period(period);
+                            cProm += l_v.get_Count_at_period(period);
+                        }
+                        foreach (Link l_v in l.headNode.outerLinks)
+						{
+							vProm += l_v.get_Vprom_at_period(period);
+							cProm += l_v.get_Count_at_period(period);
+						}
+                        vProm = vProm / (l.tailNode.innerLinks.Count + l.headNode.outerLinks.Count);
+                        cProm = cProm / (l.tailNode.innerLinks.Count + l.headNode.outerLinks.Count);
+                        double tProm = l.distanceCost / vProm;
+                        double tMax = tProm * 1.5;
+                            
+                        ttAux.add_tTime(tProm);
+
+                        for (int i = 0; i < cProm;i++)
+                        {
+                            ttAux.add_tTime(tMax);
+                        }
+                        ttAux.set_optimalA();
+                        l.add_travelTimes(ttAux);
+                    }
+                }
+            }
+
+			foreach(Node n in network.nodes)
+			{
+				if (n.dTimes.Count < count)
+				{
+					List<int> missingPeriods = new List<int>(periods_dont_present(n, minMax));
+					foreach (int period in missingPeriods)
+					{
+                        DwellTimes dtAux = new DwellTimes(period);
+
+						double vProm = 0;
+						double cProm = 0;
+                        foreach (Link l_in in n.innerLinks)
+						{
+                            vProm += l_in.tailNode.get_Vprom_at_period(period,radious);
+                            cProm += l_in.tailNode.get_Count_at_period(period);
+						}
+                        foreach (Link l_out in n.outerLinks)
+						{
+                            vProm += l_out.headNode.get_Vprom_at_period(period,radious);
+                            cProm += l_out.headNode.get_Count_at_period(period);
+						}
+                        vProm = vProm / (n.innerLinks.Count + n.outerLinks.Count);
+						cProm = cProm / (n.innerLinks.Count + n.outerLinks.Count);
+                        double tProm = 2*radious / vProm;
+						double tMax = tProm * 1.5;
+
+						dtAux.add_dTime(tProm);
+
+						for (int i = 0; i < cProm; i++)
+						{
+							dtAux.add_dTime(tMax);
+						}
+						dtAux.set_optimalA();
+                        n.add_dwellTimes(dtAux);
+					}
+				}
+			}
+        }
+
+        public List<int> periods_dont_present(Link l, double[] minMax)
+        {
+            List<int> all = new List<int>();
+            for (int i = (int)minMax[0]; i <= (int)minMax[1];i++)
+            {
+                all.Add(i);
+            }
+
+            foreach(TravelTimes tt in l.tTimes)
+            {
+                all.Remove(tt.ID_period);
+            }
+
+            return all;
+        }
+
+		public List<int> periods_dont_present(Node n, double[] minMax)
+		{
+			List<int> all = new List<int>();
+			for (int i = (int)minMax[0]; i <= (int)minMax[1]; i++)
+			{
+				all.Add(i);
+			}
+
+			foreach (DwellTimes dt in n.dTimes)
+			{
+				all.Remove(dt.ID_period);
+			}
+
+			return all;
+		}
 
 		public string get_realRoute(int veh_mac)
 		{

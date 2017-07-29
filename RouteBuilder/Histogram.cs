@@ -173,7 +173,6 @@ namespace RouteBuilder
 
         public double integral(double fromVal, double toValue)
         {
-            //corregir cuando esta fuera
             if (fromVal > this.data[this.data.Count - 1][1])
                 return 0;
             if (toValue > this.data[this.data.Count - 1][1])

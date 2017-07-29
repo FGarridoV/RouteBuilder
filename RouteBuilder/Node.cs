@@ -133,6 +133,28 @@ namespace RouteBuilder
 				}
 			}
 		}
+
+		public double get_Vprom_at_period(int period,double radious)
+		{
+			double sumSpeed = 0;
+			DwellTimes aux = dt_at_specific_period(period);
+			foreach (double t in aux.times)
+			{
+				sumSpeed += 2*radious / t;
+			}
+
+			return sumSpeed / aux.times.Count;
+		}
+
+		public double get_Count_at_period(int period)
+		{
+			return dt_at_specific_period(period).times.Count;
+		}
+
+		public void add_dwellTimes(DwellTimes dt)
+		{
+			dTimes.Add(dt);
+		}
 	}
 
 }

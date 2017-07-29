@@ -45,6 +45,11 @@ namespace RouteBuilder
 			double dataRange = this.max_value() - this.min_value();
 			int nbins = (int)Math.Floor(Math.Sqrt(dataRange));
 			this.optimalA = dataRange / nbins;
+
+			if (Math.Abs(dataRange) < 0.0000001)
+			{
+				this.optimalA = -1;
+			}
 		}
     }
 

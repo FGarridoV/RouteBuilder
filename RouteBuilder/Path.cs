@@ -7,6 +7,7 @@ namespace RouteBuilder
     {
 		//Class elements
         public List<int> nodesIDs;
+        public List<int> repeatsIDs;
 		public List<Node> nodes;
 		public List<Link> links;
         public double totalCost;
@@ -29,6 +30,7 @@ namespace RouteBuilder
         public Path(List<int> nodesIDs, Network net)
         {
             this.nodesIDs = new List<int>(nodesIDs);
+            this.repeatsIDs = new List<int>();
             nodes = new List<Node>();
             links = new List<Link>();
             this.totalCost = 0;
@@ -163,11 +165,19 @@ namespace RouteBuilder
         public double optimal_a_in_convolution(List<double> aes)
         {
             double sum = 0;
+            int count = aes.Count;
             foreach(double a in aes)
             {
-                sum = sum + a;
+                if (Math.Abs(a - -1) < 0.0000001)
+                {
+                    count--;
+                }
+                else
+                {
+                    sum = sum + a;
+                }
             }
-            return sum / aes.Count;
+            return sum / count;
         }
 
         //Method 8: return the error in tobs
@@ -192,7 +202,7 @@ namespace RouteBuilder
             this.P_missedDetections = Math.Pow((1 - p_v),n);
         }
 
-        public void set_fs(Scenario sc, int period)
+        public void set_fs_old(Scenario sc, int period)
         {
             int n = nodesIDs.Count - 2;
             double fs = 0;
@@ -206,6 +216,19 @@ namespace RouteBuilder
                 fs += f;
             }
             meanF = fs / n;
+        }
+
+        public void set_fs_if_unique(Scenario sc, int period)
+        {
+            int n = nodesIDs.Count - 2;
+            double fs = 0;
+            for (int n_pos = 1; n_pos <= n;n_pos++)
+            {
+                if(repeatsIDs[n_pos]==0)
+                {
+                    //aca el nodo es único
+                }
+            }
         }
 
         public static int factorial(int n)
@@ -254,6 +277,23 @@ namespace RouteBuilder
         {
             this.finalProb = val;
         }
+
+        public bool has_node(int node_ID)
+        {
+            foreach(int id in nodesIDs)
+            {
+                if (id == node_ID)
+                    return true;
+            }
+            return false;
+        }
+
+        public void add_count_nodes_id(int count)
+        {
+            repeatsIDs.Add(count);
+        }
+
+
     }
 
 }
