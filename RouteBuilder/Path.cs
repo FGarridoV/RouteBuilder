@@ -202,33 +202,38 @@ namespace RouteBuilder
             this.P_missedDetections = Math.Pow((1 - p_v),n);
         }
 
-        public void set_fs_old(Scenario sc, int period)
+        public void set_fs_full(Scenario sc, int period)
         {
             int n = nodesIDs.Count - 2;
             double fs = 0;
-            for (int k = 1; k <= n; k++)
-            {
-                double[] DBkv = sc.get_DB_k_and_vFull(this, period);
-                double combinatory = comb(n, k);
-                double pvk = Math.Pow(p_from_v(DBkv[1]), k);
-                double npvk = Math.Pow(1-p_from_v(DBkv[1]), n-k);
-                double f = DBkv[0] / (combinatory * pvk * npvk);
-                fs += f;
-            }
-            meanF = fs / n;
+            double[] DBkv = sc.get_DB_Full_and_v(this, period);
+            double pvk = Math.Pow(p_from_v(DBkv[1]), n);
+            fs = DBkv[0] / pvk;
+            meanF = fs;
         }
 
         public void set_fs_if_unique(Scenario sc, int period)
         {
             int n = nodesIDs.Count - 2;
             double fs = 0;
+            int n_uniques = 0;
             for (int n_pos = 1; n_pos <= n;n_pos++)
             {
                 if(repeatsIDs[n_pos]==0)
                 {
-                    //aca el nodo es único
+                    double[] DBv = sc.get_DB_node_and_v(this, nodesIDs[n_pos], period);
+                    double pv = p_from_v(DBv[1]);
+                    double npv = Math.Pow(1 - pv, n - 1);
+                    double f = DBv[0] / (pv * npv);
+                    fs += f;
+                    n_uniques++;
                 }
             }
+
+            if (n_uniques > 0)
+                meanF = fs / n_uniques;
+            else
+                meanF = -1;
         }
 
         public static int factorial(int n)
@@ -253,7 +258,7 @@ namespace RouteBuilder
             this.P_routeUses = val;
         }
 
-        public double p_from_v(double speed)
+        public static double p_from_v(double speed)
         {
             speed = speed * 3.6;
             if (speed >= 0 && speed <= 80)
@@ -291,6 +296,11 @@ namespace RouteBuilder
         public void add_count_nodes_id(int count)
         {
             repeatsIDs.Add(count);
+        }
+
+        public void set_meanF(double val)
+        {
+            this.meanF = val;
         }
 
 

@@ -41,7 +41,7 @@ namespace RouteBuilder
 			Console.WriteLine("Dwell and travel times loaded" + "\t\t\t" + System.DateTime.Now.ToString());
 
             sc.times_corrector(radious);
-            Console.WriteLine("Dwell and travel times corrected" + "\t\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("Dwell and travel times corrected" + "\t\t" + System.DateTime.Now.ToString());
 			
             sc.add_options();
             sc.add_rOptions();

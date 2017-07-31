@@ -218,7 +218,7 @@ namespace RouteBuilder
                             foreach (Path p in s.paths)
                             {
                                 Console.WriteLine("-----Paths-----");
-                                double[] a = get_DB_k_and_vFull(p, 23);
+                                double[] a = get_DB_Full_and_v(p, 23);
                                 Console.WriteLine("existen " + a[0] + "a una vel " + a[1]*3.6);
                                 foreach (int n in p.nodesIDs)
                                 {
@@ -234,7 +234,35 @@ namespace RouteBuilder
 
         }
 
-        public double[] get_DB_k_and_vFull(Path p, int period)
+        public double[] get_DB_node_and_v(Path p,int node_ID, int period)
+        {
+            int total = 0;
+            double sumSpeeds = 0;
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Trip t in v.trips)
+                {
+                    for (int i = 0; i < t.passingNodes.Count; i++)
+                    {
+                        if (period == (int)Math.Ceiling(t.enterTimePassingNodes[i] / T))
+                        {
+                            if (t.passingNodes[i] == p.nodesIDs[0] && t.passingNodes[i+1]==node_ID && t.passingNodes[i+2]==p.nodesIDs[p.nodesIDs.Count-1])
+                            {
+                                total++;
+                                sumSpeeds += p.distance / (t.enterTimePassingNodes[i] - t.exitTimePassingNodes[i+2]);
+                            }
+                        }
+                    }
+                }
+            }
+			if (total == 0)
+				return new double[] { 0, 0 };
+
+			double[] data = new double[] { total, sumSpeeds / total };
+			return data;
+        }
+
+        public double[] get_DB_Full_and_v(Path p, int period)
         {
             int total = 0;
             double sumSpeeds = 0;
