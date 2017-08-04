@@ -12,6 +12,7 @@ namespace RouteBuilder
             double T = 15 * 60;
             int k = 10;
             double radious = 25;
+            int version = 2;
 
             Console.WriteLine("Welcome to Route Builder v0.0 by TyggerSoftware Inc.\n");
 
@@ -31,7 +32,7 @@ namespace RouteBuilder
             if (rn.BTS_id().Count>0)
             {
                 Console.WriteLine("Starting a single experiment" +"\t\t\t" + System.DateTime.Now.ToString());
-                Experiment exp = new Experiment(rn, dbr, realDbr, newTripTime, newVisitTime, T, k, radious);
+                Experiment exp = new Experiment(rn, dbr, realDbr, newTripTime, newVisitTime, T, k, radious, version);
 
                 exp.scenarios[0].export_inference_vehicles();
             }

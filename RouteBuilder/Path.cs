@@ -141,6 +141,10 @@ namespace RouteBuilder
 					BinRanges.Add(tts[tts.Count - 1].optimalA);
 				}
                 double optimalRangeBin = optimal_a_in_convolution(BinRanges);
+                if(Math.Abs(optimalRangeBin - -1) < 0.000001)
+                {
+                    optimalRangeBin = 1;
+                }
 
                 List<Histogram> toConv = new List<Histogram>();
 
@@ -176,6 +180,10 @@ namespace RouteBuilder
                 {
                     sum = sum + a;
                 }
+            }
+            if(count == 0)
+            {
+                return -1;
             }
             return sum / count;
         }

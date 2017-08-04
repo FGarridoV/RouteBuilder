@@ -122,6 +122,7 @@ namespace RouteBuilder
 
         public static Histogram convolution(Histogram h1, Histogram h2)
         {
+            
             Histogram convolved = new Histogram(h1, h2, h1.a);
             List<double> boundValues = new List<double>();
             boundValues.Add(0);

@@ -14,7 +14,7 @@ namespace RouteBuilder
             //probar todas las combinaciones
         }
 
-        public Experiment(RealNetwork rn, DataBaseReader ddb, DataBaseReader realDdb, double newTripTime, double newVisitTime, double T, int K, double radious)
+        public Experiment(RealNetwork rn, DataBaseReader ddb, DataBaseReader realDdb, double newTripTime, double newVisitTime, double T, int K, double radious, int version)
         {
             nBTsensor = rn.BTS_id().Count;
             scenarios = new List<Scenario>();
@@ -47,7 +47,7 @@ namespace RouteBuilder
             sc.add_rOptions();
 			Console.WriteLine("Sections of all vehicle determinated" + "\t\t" +System.DateTime.Now.ToString());
 
-            sc.apply_methodology_old();
+            sc.apply_methodology(version);
             sc.apply_directions();
 			Console.WriteLine("Bayesian probabilities calculated" + "\t\t" + System.DateTime.Now.ToString());
 			

@@ -59,15 +59,19 @@ namespace RouteBuilder
             int k = 0;
             foreach (RealNode n in newNodes)
             {
-                List<int> auxNodes = new List<int>(search_new_links(RealNode.node_by_ID(nodes,n.ID)));
+                List<int> visitedNodes = new List<int>(); 
+                List<int> auxNodes = new List<int>(search_new_links(RealNode.node_by_ID(nodes,n.ID),visitedNodes));
 
                 foreach(int num in auxNodes)
                 {
-                    RealLink rl = new RealLink(k, n, RealNode.node_by_ID(newNodes,num));
-                    n.add_outerLink(rl);
-                    RealNode.node_by_ID(newNodes, num).add_innerLink(rl);
-                    newLinks.Add(rl);
-                    k++;
+                    if (n.ID != num)
+                    {
+                        RealLink rl = new RealLink(k, n, RealNode.node_by_ID(newNodes, num));
+                        n.add_outerLink(rl);
+                        RealNode.node_by_ID(newNodes, num).add_innerLink(rl);
+                        newLinks.Add(rl);
+                        k++;
+                    }
                 }
             }
             RealNetwork model = new RealNetwork(newNodes, newLinks);
@@ -75,22 +79,27 @@ namespace RouteBuilder
         }
 
         //Method 2: Generate the new links
-        public List<int> search_new_links(RealNode n)
+        public List<int> search_new_links(RealNode n, List<int> visitedNodes)
         {
             List<int> headNodes = new List<int>();
+            visitedNodes = new List<int>(visitedNodes);
 
             foreach (RealLink l in n.outerLinks)
             {
+                if (visitedNodes.Contains(l.headNode.ID))
+                    continue;
+                visitedNodes.Add(l.headNode.ID);
                 if(!l.headNode.hasSensor)
                 {
-                    headNodes.AddRange(search_new_links(l.headNode));
+                    headNodes.AddRange(search_new_links(l.headNode,visitedNodes));
+
                 }
                 else
                 {
                     headNodes.Add(l.headNode.ID);
                 }
             }
-
+	
             return headNodes;
         }
 

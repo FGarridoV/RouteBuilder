@@ -244,12 +244,12 @@ namespace RouteBuilder
                 {
                     for (int i = 0; i < t.passingNodes.Count; i++)
                     {
-                        if (period == (int)Math.Ceiling(t.enterTimePassingNodes[i] / T))
+                        if (period == (int)Math.Ceiling(t.enterTimePassingNodes[i] / T) && t.passingNodes.Count>i+2)
                         {
                             if (t.passingNodes[i] == p.nodesIDs[0] && t.passingNodes[i+1]==node_ID && t.passingNodes[i+2]==p.nodesIDs[p.nodesIDs.Count-1])
                             {
                                 total++;
-                                sumSpeeds += p.distance / (t.enterTimePassingNodes[i] - t.exitTimePassingNodes[i+2]);
+                                sumSpeeds += p.distance / (t.enterTimePassingNodes[i+2] - t.exitTimePassingNodes[i]);
                             }
                         }
                     }
@@ -370,7 +370,7 @@ namespace RouteBuilder
             return data;
         }
 
-        public void apply_methodology_old()
+        public void apply_methodology(int version)
         {
             foreach(Vehicle v in vehicles)
             {
@@ -380,7 +380,7 @@ namespace RouteBuilder
                     {
                         if (s.paths.Count >= 2)
                         {
-                            s.apply_BayesianInference_old(this);
+                            s.apply_BayesianInference(this, version);
                         }
 
                         else if (s.paths.Count == 1)
@@ -458,7 +458,7 @@ namespace RouteBuilder
         public void times_corrector(double radious)
         {
             double[] minMax = min_max_period_ID();
-            int count = (int)(minMax[1] - minMax[0]);
+            int count = (int)(minMax[1] - minMax[0]+1);
 
             foreach(Link l in network.links)
             {
@@ -471,18 +471,33 @@ namespace RouteBuilder
 
                         double vProm = 0;
                         double cProm = 0;
+                        int counts = 0;
                         foreach(Link l_v in l.tailNode.innerLinks)
                         {
-                            vProm += l_v.get_Vprom_at_period(period);
-                            cProm += l_v.get_Count_at_period(period);
+                            if (l_v.tt_at_specific_period(period)!=null)
+                            {
+                                vProm += l_v.get_Vprom_at_period(period);
+                                cProm += l_v.get_Count_at_period(period);
+                                counts++;
+                            }
                         }
                         foreach (Link l_v in l.headNode.outerLinks)
 						{
-							vProm += l_v.get_Vprom_at_period(period);
-							cProm += l_v.get_Count_at_period(period);
+                            if (l_v.tt_at_specific_period(period)!=null)
+                            {
+                                vProm += l_v.get_Vprom_at_period(period);
+                                cProm += l_v.get_Count_at_period(period);
+                                counts++;
+                            }
 						}
-                        vProm = vProm / (l.tailNode.innerLinks.Count + l.headNode.outerLinks.Count);
-                        cProm = cProm / (l.tailNode.innerLinks.Count + l.headNode.outerLinks.Count);
+                        vProm = vProm / counts;
+                        cProm = cProm / counts;
+
+                        if(Math.Abs(vProm) < 0.00001 || counts == 0)
+                        {
+                            vProm = 5;
+                            cProm = 1;
+                        }
                         double tProm = l.distanceCost / vProm;
                         double tMax = tProm * 1.5;
                             
@@ -494,6 +509,10 @@ namespace RouteBuilder
                         }
                         ttAux.set_optimalA();
                         l.add_travelTimes(ttAux);
+                        if(!(ttAux.optimalA>0 && ttAux.optimalA < 100000000))
+                        {
+                            
+                        }
                     }
                 }
             }
