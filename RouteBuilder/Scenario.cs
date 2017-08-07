@@ -493,7 +493,7 @@ namespace RouteBuilder
                         vProm = vProm / counts;
                         cProm = cProm / counts;
 
-                        if(Math.Abs(vProm) < 0.00001 || counts == 0)
+                        if(Math.Abs(vProm) < 0.000001 || counts == 0)
                         {
                             vProm = 5;
                             cProm = 1;

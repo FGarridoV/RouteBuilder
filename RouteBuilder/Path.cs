@@ -172,7 +172,7 @@ namespace RouteBuilder
             int count = aes.Count;
             foreach(double a in aes)
             {
-                if (Math.Abs(a - -1) < 0.0000001)
+                if (Math.Abs(a - -1) < 0.000001)
                 {
                     count--;
                 }

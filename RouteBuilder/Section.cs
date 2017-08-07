@@ -252,25 +252,108 @@ namespace RouteBuilder
                         nPathsToProve.RemoveAt(0);
                         nPathsToProve.AddRange(aux);
                     }
-                }
-                double[] ressA = ress.ToArray();
-                Matrix<double> A = CreateMatrix.DenseOfRowArrays<double>(equations);
-                Matrix<double> B = CreateMatrix.DenseOfColumnArrays<double>(ressA);
-                Matrix<double> X = A.Inverse() * B;
 
-                for (int i = 0; i < paths.Count;i++)
+                    while (deleteLD(equations, ress) == true) { }
+
+                    if (equations.Count == 0)
+                        break;
+                }
+
+                if (equations.Count > 0)
                 {
-                    if(paths[i].meanF<0)
+                    for (int i = 0; i < paths.Count; i++)
                     {
-                        paths[i].set_meanF(X[i, 0]);
+                        if (Math.Abs(paths[i].meanF - -1) > 0.000001)
+                        {
+                            add_cononicEquations(i, equations, ress);
+                        }
                     }
-                }
+                    while (deleteLD(equations, ress) == true) { }
 
+					double[] ressA = ress.ToArray();
+					Matrix<double> A = CreateMatrix.DenseOfRowArrays<double>(equations);
+					Matrix<double> B = CreateMatrix.DenseOfColumnArrays<double>(ressA);
+					Matrix<double> X = A.Inverse() * B;
+
+					for (int i = 0; i < paths.Count; i++)
+					{
+						if (paths[i].meanF < 0)
+						{
+							paths[i].set_meanF(X[i, 0]);
+						}
+					}
+                }
+            }
+        }
+
+        public void add_cononicEquations(int pos, List<double[]> equations, List<double> res)
+        {
+            double[] aux = new double[paths.Count];
+            for (int i = 0; i < aux.Length;i++)
+            {
+                if (i == pos)
+                    aux[i] = 1;
+                else
+                    aux[i] = 0;
             }
 
+            double r = paths[pos].meanF;
 
+            equations.Add(aux);
+            res.Add(r);
+        }
 
+        public static bool deleteLD(List<double[]> equations, List<double> res)
+        {
+            for (int i = 0; i < res.Count;i++)
+            {
+                for (int j = 0; j < equations.Count;j++)
+                {
+                    if (i != j)
+                    {
+                        if (areLD(equations[i], equations[j], res[i], res[j]) == true)
+                        {
+                            equations.RemoveAt(j);
+                            res.RemoveAt(j);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
+        public static bool areLD(double[] eq1, double[] eq2, double r1, double r2)
+        {
+            double ver=0;
+            if(Math.Abs(r1) > 0.000001 && Math.Abs(r2) > 0.000001)
+                ver = r1/r2;
+            else
+            {
+                for (int i = 0; i < eq1.Length; i++)
+                {
+                    if (Math.Abs(eq1[i]) > 0.000001 && Math.Abs(eq2[i]) > 0.000001)
+                        ver = eq1[i] / eq1[i];
+                }
+            }
+            if(Math.Abs(ver) < 0.000001)
+            {
+                return false;
+            }
+            for (int i = 0; i < eq1.Length;i++)
+            {
+                if (Math.Abs(eq2[i]) > 0.000001)
+                {
+                    if (Math.Abs(eq1[i] / eq2[i] - ver) > 0.000001)
+                        return false;
+                }
+                else
+                {
+                    if (Math.Abs(eq1[i]) > 0.000001)
+                        return false;
+                }
+            }
+            return true;
         }
 
         public List<int> update_system_equations(List<double[]> equations, List<double> ress, int nPath)
@@ -363,7 +446,7 @@ namespace RouteBuilder
             int pathX = -1;
             foreach(int i in path_pos)
             {
-                if (Math.Abs(paths[i].meanF - -1) < 0.0000001)
+                if (Math.Abs(paths[i].meanF - -1) < 0.000001)
                 {
                     num++;
                     pathX = i;
@@ -423,7 +506,7 @@ namespace RouteBuilder
             {
                 ver += p.P_totalTravelTime*p.P_missedDetections*p.P_routeUses;
             }
-            if(Math.Abs(ver) < 0.00000001)
+            if(Math.Abs(ver) < 0.000001)
             {
                 
             }
