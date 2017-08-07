@@ -120,7 +120,7 @@ namespace RouteBuilder
 			}
         }
 
-		public void set_P_ru_to_paths_equi(Scenario sc)
+		public void set_P_ru_to_paths_equi()
 		{
             foreach (Path p in paths)
             {
@@ -149,29 +149,35 @@ namespace RouteBuilder
 			}
 
 		}
-		public void set_P_ru_to_paths_chung2014(Scenario sc)
+		public void set_P_ru_to_paths_chung2014()
 		{
 
 			List<Path> options = new List<Path>();
-			foreach (Path p in paths)
+			Random rnd = new Random();
+            foreach (Path p in paths)
 			{
-				p.set_P_ru(0);
+                p.set_P_ru(0);
+                p.rnd = rnd.Next();
 				options.Add(p);
 			}
-			options.Sort((x, y) => x.distance.CompareTo(y.distance));
+            options.Sort((x,y) => x.rnd.CompareTo(y.rnd));  
+            options.Sort((x, y) => x.nodes.Count.CompareTo(y.nodes.Count));
 			options[0].set_P_ru(1);
 		}
 
-		public void set_P_ru_to_paths_chung2017(Scenario sc)
+		public void set_P_ru_to_paths_chung2017()
 		{
             
             List<Path> options = new List<Path>();
-			foreach (Path p in paths)
+			Random rnd = new Random();
+            foreach (Path p in paths)
 			{
                 p.set_P_ru(0);
+				p.rnd = rnd.Next();
                 options.Add(p);
 			}
-            options.Sort((x, y) => x.distance.CompareTo(y.distance));
+			options.Sort((x, y) => x.rnd.CompareTo(y.rnd));
+			options.Sort((x, y) => x.distance.CompareTo(y.distance));
             options[0].set_P_ru(1);
 		}
 
@@ -414,7 +420,7 @@ namespace RouteBuilder
             List<int[]> aux = new List<int[]>();
             for (int i = 0; i < repeatsColl.Count;i++)
             {
-                int[] vals = new int[] { repeatsColl[i], i };
+                int[] vals = { repeatsColl[i], i };
                 aux.Add(vals);
             }
 
@@ -490,15 +496,15 @@ namespace RouteBuilder
             set_P_ttt_to_paths();
             set_P_md_to_paths();
             if (version == 1)
-                set_P_ru_to_paths_equi(sc);
+                set_P_ru_to_paths_equi();
             else if (version == 2)
                 set_P_ru_to_paths_full(sc);
             else if (version == 3)
                 set_P_ru_to_paths_complete(sc);
             else if (version == 4)
-                set_P_ru_to_paths_chung2014(sc);
+                set_P_ru_to_paths_chung2014();
             else
-                set_P_ru_to_paths_chung2017(sc);
+                set_P_ru_to_paths_chung2017();
 
             ////////////
             double ver = 0;

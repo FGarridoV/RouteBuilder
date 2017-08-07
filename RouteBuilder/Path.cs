@@ -24,6 +24,7 @@ namespace RouteBuilder
         public double meanF;
 
         public double finalProb;
+        public double rnd;
 
 
         //Constructor
