@@ -417,6 +417,18 @@ namespace RouteBuilder
             else
                 set_P_ru_to_paths_chung2017(sc);
 
+            ////////////
+            double ver = 0;
+            foreach(Path p in paths)
+            {
+                ver += p.P_totalTravelTime*p.P_missedDetections*p.P_routeUses;
+            }
+            if(Math.Abs(ver) < 0.00000001)
+            {
+                
+            }
+            /////////// 
+
 
             double totalProb = 0; 
             foreach(Path p in paths)

@@ -9,6 +9,7 @@ namespace RouteBuilder
         public RealNode tailNode;
         public RealNode headNode;
         public double distance;
+        public double auxDistance;
         public double dijkstraDistance;
         public double dijkstraNodes;
 

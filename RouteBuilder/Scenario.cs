@@ -55,7 +55,7 @@ namespace RouteBuilder
                 if (i == (int)((dets.detections.Count - 1) * j / 100))
                 {
                     if (j == 100)
-                        Console.WriteLine("\u2588\t" + System.DateTime.Now.ToString());//"\u25A0");
+                        Console.WriteLine("\u2588\t" + System.DateTime.Now.ToString());
 
                     else
                     {
@@ -509,10 +509,6 @@ namespace RouteBuilder
                         }
                         ttAux.set_optimalA();
                         l.add_travelTimes(ttAux);
-                        if(!(ttAux.optimalA>0 && ttAux.optimalA < 100000000))
-                        {
-                            
-                        }
                     }
                 }
             }

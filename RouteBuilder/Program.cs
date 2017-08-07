@@ -10,11 +10,11 @@ namespace RouteBuilder
             double newTripTime = 30 * 60;
             double newVisitTime = 3 * 60;
             double T = 15 * 60;
-            int k = 10;
+            int k = 4;
             double radious = 25;
             int version = 2;
 
-            Console.WriteLine("Welcome to Route Builder v0.0 by TyggerSoftware Inc.\n");
+            Console.WriteLine("Welcome to Route Builder v1.0 by TyggerSoftware Inc.\n");
 
             NetworkReader nr = new NetworkReader("nodes.ty","links.ty");
             Console.WriteLine("Network loaded" +"\t\t\t\t\t"+ System.DateTime.Now.ToString());

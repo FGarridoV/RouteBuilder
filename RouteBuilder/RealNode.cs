@@ -11,7 +11,7 @@ namespace RouteBuilder
         public List<RealLink> outerLinks;
         double[] position;
         public bool hasSensor;
-        double dijkstraTag;
+        double[] dijkstraTag;
 
         //Constructor with info
         public RealNode(int ID, double posX, double posY)
@@ -21,6 +21,7 @@ namespace RouteBuilder
             this.outerLinks = new List<RealLink>();
             this.position = new double[] { posX, posY };
             hasSensor = false;
+            dijkstraTag = new double[2];
         }
 
         //Constructor with another node
@@ -69,13 +70,13 @@ namespace RouteBuilder
         }
 
 		//Method 6: assing a dijkstra tag
-		public void set_dijkstraTag(double distance)
+		public void set_dijkstraTag(double distance, int pos)
         {
-            this.dijkstraTag = distance;      
+            this.dijkstraTag[pos] = distance;      
         }
 
 		//Method 7: obtain a dijkstra tag
-		public double get_dijkstraTag()
+		public double[] get_dijkstraTag()
         {
             return this.dijkstraTag;
         }

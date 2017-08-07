@@ -104,17 +104,34 @@ namespace RouteBuilder
         }
 
         //Method 3: Determinate de minimal distance 
-        public double dijkstraDist(int nodeID1, int nodeID2)
+        public double[] dijkstra(int nodeID1, int nodeID2)
         {
+            foreach(RealLink l in links)
+            {
+                l.auxDistance = l.distance;
+                if (l.headNode.hasSensor == true || l.tailNode.hasSensor == true)
+                {
+                    if (!((l.headNode.ID == nodeID2 && l.tailNode.ID== nodeID1) || (l.headNode.ID == nodeID2 && l.tailNode.hasSensor == false)||(l.tailNode.ID == nodeID1 && l.headNode.hasSensor == false)))
+                        l.auxDistance = double.PositiveInfinity;
+                }
+            }
+
             List<RealNode> DijkNodes = new List<RealNode>(nodes);
             double distance = 0;
+            double nods = 0;
 
             foreach(RealNode n in DijkNodes)
             {
                 if (n.ID == nodeID1)
-                    n.set_dijkstraTag(0);
+                {
+                    n.set_dijkstraTag(0, 0);
+                    n.set_dijkstraTag(0, 1);
+                }
                 else
-                    n.set_dijkstraTag(double.PositiveInfinity);
+                {
+                    n.set_dijkstraTag(double.PositiveInfinity, 0);
+                    n.set_dijkstraTag(0,1);
+                }
             }
 
             while (DijkNodes.Count>0)
@@ -123,34 +140,51 @@ namespace RouteBuilder
                 int pos = minPos(DijkNodes);
                 RealNode permanent = DijkNodes[pos];
 
-				if (DijkNodes[pos].ID == nodeID2)
-					distance = permanent.get_dijkstraTag();
+                if (DijkNodes[pos].ID == nodeID2)
+                {
+                    distance = permanent.get_dijkstraTag()[0];
+                    nods = permanent.get_dijkstraTag()[1];
+                }
 
                 DijkNodes.RemoveAt(pos);
 
                 foreach(RealLink l in permanent.outerLinks)
                 {
-                    if (l.headNode.get_dijkstraTag() > permanent.get_dijkstraTag() + l.distance)
-                        l.headNode.set_dijkstraTag(permanent.get_dijkstraTag() + l.distance);
+                    if (l.headNode.get_dijkstraTag()[0] > permanent.get_dijkstraTag()[0] + l.auxDistance)
+                    {
+                        l.headNode.set_dijkstraTag(permanent.get_dijkstraTag()[0] + l.auxDistance,0);
+                        l.headNode.set_dijkstraTag(permanent.get_dijkstraTag()[1]+1,1);
+                    }
                 }
             }
 
-            return distance;
+            return new double[]{distance,nods};
 
         }
 
         //Method 4: Determinate the minamal number of nodes
 		public double dijkstraNodes(int nodeID1, int nodeID2)
 		{
+
+			foreach (RealLink l in links)
+			{
+				l.auxDistance = l.distance;
+				if (l.headNode.hasSensor == true || l.tailNode.hasSensor == true)
+				{
+					if (!((l.headNode.ID == nodeID2 && l.tailNode.ID == nodeID1) || (l.headNode.ID == nodeID2 && l.tailNode.hasSensor == false) || (l.tailNode.ID == nodeID1 && l.headNode.hasSensor == false)))
+						l.auxDistance = double.PositiveInfinity;
+				}
+			}
+
 			List<RealNode> DijkNodes = new List<RealNode>(nodes);
 			double distance = 0;
 
 			foreach (RealNode n in DijkNodes)
 			{
 				if (n.ID == nodeID1)
-					n.set_dijkstraTag(0);
+					n.set_dijkstraTag(0,0);
 				else
-					n.set_dijkstraTag(double.PositiveInfinity);
+					n.set_dijkstraTag(double.PositiveInfinity,0);
 			}
 
 			while (DijkNodes.Count > 0)
@@ -160,14 +194,14 @@ namespace RouteBuilder
 				RealNode permanent = DijkNodes[pos];
 
 				if (DijkNodes[pos].ID == nodeID2)
-					distance = permanent.get_dijkstraTag();
+					distance = permanent.get_dijkstraTag()[0];
 
 				DijkNodes.RemoveAt(pos);
 
 				foreach (RealLink l in permanent.outerLinks)
 				{
-					if (l.headNode.get_dijkstraTag() > permanent.get_dijkstraTag() + 1)
-						l.headNode.set_dijkstraTag(permanent.get_dijkstraTag() + 1);
+					if (l.headNode.get_dijkstraTag()[0] > permanent.get_dijkstraTag()[0] + 1)
+						l.headNode.set_dijkstraTag(permanent.get_dijkstraTag()[0] + 1,0);
 				}
 			}
 
@@ -178,13 +212,13 @@ namespace RouteBuilder
         //Method 5: calculate the position of the minimal node
         public int minPos(List<RealNode> list)
         {
-            double min = list[0].get_dijkstraTag();
+            double min = list[0].get_dijkstraTag()[0];
             int resp = -1;
             for (int i = 0; i < list.Count;i++)
             {
-                if (list[i].get_dijkstraTag() <= min)
+                if (list[i].get_dijkstraTag()[0] <= min)
                 {
-                    min = list[i].get_dijkstraTag();
+                    min = list[i].get_dijkstraTag()[0];
                     resp = i;
                 }   
             }
@@ -196,10 +230,10 @@ namespace RouteBuilder
         {
             foreach(RealLink l in this.links)
             {
-                double nod = RealNet.dijkstraNodes(l.tailNode.ID, l.headNode.ID);
-                double dist = RealNet.dijkstraDist(l.tailNode.ID, l.headNode.ID);
-                l.set_dijkstraDistance(dist);
-                l.set_dijkstraNodes(nod);
+                double[] distNod = RealNet.dijkstra(l.tailNode.ID, l.headNode.ID);
+
+                l.set_dijkstraDistance(distNod[0]);
+                l.set_dijkstraNodes(distNod[1]);
             }
         }
 
