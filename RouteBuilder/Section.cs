@@ -120,6 +120,20 @@ namespace RouteBuilder
 			}
         }
 
+		public void set_P_ru_to_paths_with_flows()
+		{
+			double totalFlow = 0;
+			foreach (Path p in paths)
+			{
+				totalFlow += p.meanF;
+			}
+
+			foreach (Path p in paths)
+			{
+				p.set_P_ru(p.meanF / totalFlow);
+			}
+		}
+
 		public void set_P_ru_to_paths_equi()
 		{
             foreach (Path p in paths)
@@ -142,11 +156,21 @@ namespace RouteBuilder
 			{
 				totalFlow += p.meanF;
 			}
+            if (totalFlow > 0)
+            {
+                foreach (Path p in paths)
+                {
+                    p.set_P_ru(p.meanF / totalFlow);
+                }
+            }
 
-			foreach (Path p in paths)
-			{
-				p.set_P_ru(p.meanF / totalFlow);
-			}
+            else
+            {
+				foreach (Path p in paths)
+				{
+                    p.set_P_ru(1/paths.Count);
+				}
+            }
 
 		}
 		public void set_P_ru_to_paths_chung2014()
@@ -181,6 +205,33 @@ namespace RouteBuilder
             options[0].set_P_ru(1);
 		}
 
+        public void assing_flows_when_delete_eq(List<double[]> eqs, int posEq)
+        {
+            List<int> Paths_in_others_eqs = new List<int>();
+
+            for (int i = 0; i < eqs.Count; i++)
+            {
+                if (i != posEq)
+                {
+                    for (int j = 0; j < eqs[i].Length; j++)
+                    {
+                        if (Math.Abs(eqs[i][j]) > 0.000001 && !Paths_in_others_eqs.Contains(j))
+                        {
+                            Paths_in_others_eqs.Add(j);
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < eqs[posEq].Length; i++)
+            {
+                if (Math.Abs(eqs[posEq][i]) > 0.000001 && !Paths_in_others_eqs.Contains(i))
+                {
+                    paths[i].set_meanF(0);
+                }
+            }
+        }
+
         public void set_flows_by_system(Scenario sc, int period)
         {
             List<int> nodesEval = new List<int>(nodes_not_uniques());
@@ -200,9 +251,9 @@ namespace RouteBuilder
                         double sumatory = 0;
                         foreach (int i in path_pos)
                         {
-                            if (paths[path_pos[i]].meanF >= 0)
+                            if (paths[i].meanF >= 0)
                             {
-                                sumatory += paths[path_pos[i]].meanF * Pv * Math.Pow(1 - Pv, paths[path_pos[i]].nodesIDs.Count - 3);
+                                sumatory += paths[i].meanF * Pv * Math.Pow(1 - Pv, paths[i].nodesIDs.Count - 3);
                             }
                         }
                         double f = (DBv[0] - sumatory) / (Pv * Math.Pow(1 - Pv, paths[nX[1]].nodesIDs.Count - 3));
@@ -212,82 +263,99 @@ namespace RouteBuilder
                     else if (nX[0] > 1)
                     {
                         double[] eq = new double[paths.Count];
-                        for (int i = 0; i < path_pos.Count;i++)
+                        for (int i = 0; i < path_pos.Count; i++)
                         {
-                            if(paths[path_pos[i]].meanF < 0)
+                            if (paths[path_pos[i]].meanF < 0)
                             {
-                                eq[path_pos[i]] = Pv * Math.Pow(1-Pv,paths[path_pos[i]].nodesIDs.Count-3);
+                                eq[path_pos[i]] = Pv * Math.Pow(1 - Pv, paths[path_pos[i]].nodesIDs.Count - 3);
                             }
                             else
                             {
                                 eq[path_pos[i]] = 0;
                             }
                         }
-						double res = DBv[0];
+                        double res = DBv[0];
                         for (int i = 0; i < path_pos.Count; i++)
                         {
-							if (paths[path_pos[i]].meanF >= 0)
-							{
-                                res-=paths[path_pos[i]].meanF*Pv * Math.Pow(1 - Pv, paths[path_pos[i]].nodesIDs.Count - 3);
-							}
+                            if (paths[path_pos[i]].meanF >= 0)
+                            {
+                                res -= paths[path_pos[i]].meanF * Pv * Math.Pow(1 - Pv, paths[path_pos[i]].nodesIDs.Count - 3);
+                            }
                         }
                         equations.Add(eq);
                         ress.Add(res);
                     }
                 }
-
-                while(number_Xs(equations)>equations.Count)
-                {
-                    int rank = 1;
-					int nPath = f_times_repeat(equations, rank)[0];
-					double[] DBv = sc.get_DB_Full_and_v(paths[nPath], period);
-                    rank++;
-                    while(Math.Abs(DBv[0]) < 0.000001 && rank<=number_Xs(equations) && f_times_repeat(equations, rank)[1]>0)
-                    {
-                        nPath = f_times_repeat(equations, rank)[0];
-                        DBv = sc.get_DB_Full_and_v(paths[nPath], period);
-                        rank++;
-                    }
-                    paths[nPath].set_fs_full(sc, period);
-
-                    List<int> nPathsToProve = new List<int>(update_system_equations(equations,ress,nPath));
-
-                    while(nPathsToProve.Count>0)
-                    {
-                        List<int> aux = new List<int>(update_system_equations(equations, ress, nPathsToProve[0]));
-                        nPathsToProve.RemoveAt(0);
-                        nPathsToProve.AddRange(aux);
-                    }
-
-                    while (deleteLD(equations, ress) == true) { }
-
-                    if (equations.Count == 0)
-                        break;
-                }
-
                 if (equations.Count > 0)
                 {
-                    for (int i = 0; i < paths.Count; i++)
+                    while (number_Xs(equations) > equations.Count)
                     {
-                        if (Math.Abs(paths[i].meanF - -1) > 0.000001)
+                        int rank = 1;
+                        int nPath = f_times_repeat(equations, rank)[0];
+                        double[] DBv = sc.get_DB_Full_and_v(paths[nPath], period);
+                        rank++;
+                        while (Math.Abs(DBv[0]) < 0.000001 && rank <= number_Xs(equations) && f_times_repeat(equations, rank)[1] > 0)
                         {
-                            add_cononicEquations(i, equations, ress);
+                            nPath = f_times_repeat(equations, rank)[0];
+                            DBv = sc.get_DB_Full_and_v(paths[nPath], period);
+                            rank++;
+                        }
+                        paths[nPath].set_fs_full(sc, period);
+
+                        List<int> nPathsToProve = new List<int>(update_system_equations(equations, ress, nPath));
+
+                        while (nPathsToProve.Count > 0)
+                        {
+                            List<int> aux = new List<int>(update_system_equations(equations, ress, nPathsToProve[0]));
+                            nPathsToProve.RemoveAt(0);
+                            nPathsToProve.AddRange(aux);
+                        }
+
+                        while (deleteLD(equations, ress) == true){}
+
+                        for (int i = 0; i < ress.Count;i++)
+                        {
+                            if(Math.Abs(ress[i]) < 0.000001)
+                            {
+                                assing_flows_when_delete_eq(equations,i);
+                                ress.RemoveAt(i);
+                                equations.RemoveAt(i);
+                            }
+                        }
+
+                        while (deleteEquals(equations, ress) == true) { }
+
+                        if (equations.Count == 0)
+                            break;
+
+
+                    }
+
+                    if (equations.Count > 0)
+                    {
+                        for (int i = 0; i < paths.Count; i++)
+                        {
+                            if (Math.Abs(paths[i].meanF - -1) > 0.000001)
+                            {
+                                add_cononicEquations(i, equations, ress);
+                            }
+                        }
+
+                        while (deleteLD(equations, ress) == true) { }
+
+                        double[] ressA = ress.ToArray();
+                        Matrix<double> A = CreateMatrix.DenseOfRowArrays<double>(equations);
+                        Matrix<double> B = CreateMatrix.DenseOfColumnArrays<double>(ressA);
+                        Matrix<double> X = A.Inverse() * B;
+
+                        for (int i = 0; i < paths.Count; i++)
+                        {
+                            if (paths[i].meanF < 0)
+                            {
+                                paths[i].set_meanF(X[i, 0]);
+                            }
                         }
                     }
-                    while (deleteLD(equations, ress) == true) { }
-
-					double[] ressA = ress.ToArray();
-					Matrix<double> A = CreateMatrix.DenseOfRowArrays<double>(equations);
-					Matrix<double> B = CreateMatrix.DenseOfColumnArrays<double>(ressA);
-					Matrix<double> X = A.Inverse() * B;
-
-					for (int i = 0; i < paths.Count; i++)
-					{
-						if (paths[i].meanF < 0)
-						{
-							paths[i].set_meanF(X[i, 0]);
-						}
-					}
                 }
             }
         }
@@ -311,6 +379,8 @@ namespace RouteBuilder
 
         public static bool deleteLD(List<double[]> equations, List<double> res)
         {
+            if(equations.Count==16 && equations[0].Length==12)
+            {}
             for (int i = 0; i < res.Count;i++)
             {
                 for (int j = 0; j < equations.Count;j++)
@@ -328,6 +398,26 @@ namespace RouteBuilder
             }
             return false;
         }
+
+        public static bool deleteEquals(List<double[]> equations, List<double> res)
+		{
+			for (int i = 0; i < equations.Count; i++)
+			{
+				for (int j = 0; j < equations.Count; j++)
+				{
+					if (i != j)
+					{
+						if (areEQUALS(equations[i], equations[j]) == true)
+						{
+							equations.RemoveAt(j);
+							res.RemoveAt(j);
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
 
         public static bool areLD(double[] eq1, double[] eq2, double r1, double r2)
         {
@@ -358,6 +448,16 @@ namespace RouteBuilder
                     if (Math.Abs(eq1[i]) > 0.000001)
                         return false;
                 }
+            }
+            return true;
+        }
+
+        public static bool areEQUALS(double[] eq1, double[] eq2)
+        {
+            for (int i = 0; i < eq1.Length; i++)
+            {
+                if ((Math.Abs(eq1[i]) < 0.000001 && Math.Abs(eq2[i]) > 0.000001) || (Math.Abs(eq1[i]) > 0.000001 && Math.Abs(eq2[i]) < 0.000001))
+                    return false;
             }
             return true;
         }
@@ -491,6 +591,15 @@ namespace RouteBuilder
             return nodesRes;
         }
 
+        public void set_Pt_equi()
+        {
+			foreach (Path p in paths)
+			{
+                p.P_totalTravelTime = 1.0 / paths.Count;
+			} 
+        }
+
+
         public void apply_BayesianInference(Scenario sc, int version)
         {
             set_P_ttt_to_paths();
@@ -506,17 +615,42 @@ namespace RouteBuilder
             else
                 set_P_ru_to_paths_chung2017();
 
-            ////////////
-            double ver = 0;
+
+            double verTotal = 0;
+            double verPru = 0;
+            double verPt = 0;
             foreach(Path p in paths)
             {
-                ver += p.P_totalTravelTime*p.P_missedDetections*p.P_routeUses;
+                verTotal += p.P_totalTravelTime*p.P_missedDetections*p.P_routeUses;
+                verPru += p.P_routeUses;
+                verPt += p.P_routeUses;
             }
-            if(Math.Abs(ver) < 0.000001)
+            if(Math.Abs(verTotal) < 0.000001)
             {
-                
+                if(Math.Abs(verPru) < 0.000001)
+                {
+                    set_P_ru_to_paths_equi();
+                }
+
+                else if(verPru>0)
+                {
+                    foreach(Path p in paths)
+                    {
+                        if (Math.Abs(p.meanF) < 0.000001)
+                        {
+                            p.set_meanF(0.0001);
+                        }
+                    }
+                    set_P_ru_to_paths_with_flows();
+
+                }
+                else if(Math.Abs(verPt) < 0.000001)
+                {
+                    set_Pt_equi();
+                }
+
             }
-            /////////// 
+
 
 
             double totalProb = 0; 

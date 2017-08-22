@@ -26,12 +26,12 @@ namespace RouteBuilder
 
             vehicles = new List<Vehicle>();
             create_vehicles(dets, vehicles);
-
+            Console.WriteLine("Model vehicle entities created: " + vehicles.Count + "\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("");
             rVehicles = new List<Vehicle>();
             create_vehicles(rDets, rVehicles);
-
-            Console.WriteLine("Vehicles created: " + vehicles.Count + "\t\t\t\t" + System.DateTime.Now.ToString());
-            Console.WriteLine("Real vehicles: " + rVehicles.Count + "\t\t\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("Real vehicle entities created: " + rVehicles.Count + "\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("");
         }
 
         public void create_vehicles(DetectionsDB dets, List<Vehicle> vehicles)
@@ -113,19 +113,37 @@ namespace RouteBuilder
 		//Method 4: Add options to all vehicles
 		public void add_options()
 		{
+			int i = 0;
+			int j = 5;
+			Console.WriteLine("\t\t\t0%\t50%\t100%");
+			Console.Write("Determinung subpaths...\t");
 			foreach (Vehicle v in vehicles)
 			{
                 v.add_tripOptions(network ,K, T);
+
+                if (i == (int)((vehicles.Count - 1) * j / 100))
+				{
+					if (j == 100)
+						Console.WriteLine("\u2588\t" + System.DateTime.Now.ToString());//"\u25A0");
+
+					else
+					{
+						Console.Write("\u2588");
+						j += 5;
+					}
+				}
+				i++;
 			}
+
 		}
 
 		//Method 4a: Add options to all vehicles
 		public void add_rOptions()
 		{
-			foreach (Vehicle v in rVehicles)
-			{
-				v.add_tripOptions(network, 1, T);
-			}
+            foreach (Vehicle v in rVehicles)
+            {
+                v.add_tripOptions(network, 1, T);
+            }
 		}
 
         //Method 5: Add times to the network
@@ -197,9 +215,6 @@ namespace RouteBuilder
                         }
                     }
                 }
-
-				if (v.MAC == 364)
-                {
                     Console.WriteLine("The vehicle " + v.MAC + " has " + sectionToInference + "/" + totalSections + " sections  to make inference");
 
                     Console.WriteLine("The detections are:");
@@ -229,7 +244,7 @@ namespace RouteBuilder
 
                         }
                     }
-                }
+
             }
 
         }
@@ -372,6 +387,10 @@ namespace RouteBuilder
 
         public void apply_methodology(int version)
         {
+			int i = 0;
+			int j = 5;
+			Console.WriteLine("\t\t\t0%\t50%\t100%");
+			Console.Write("Infering routes...\t");
             foreach(Vehicle v in vehicles)
             {
                 foreach(Trip t in v.trips)
@@ -387,6 +406,21 @@ namespace RouteBuilder
                             s.apply_ObiouslyInference();
                     }
                 }
+
+				if (i == (int)((vehicles.Count - 1) * j / 100))
+				{
+					if (j == 100)
+						Console.WriteLine("\u2588\t" + System.DateTime.Now.ToString());//"\u25A0");
+
+					else
+					{
+						Console.Write("\u2588");
+						j += 5;
+					}
+				}
+				i++;
+
+
             }
         }
 

@@ -63,7 +63,19 @@ namespace RouteBuilder
 
 		public int bin_pos(double t)
 		{
-            int pos = (int)Math.Ceiling(((t - min) / a)-1);
+            int pos;
+            if(Math.Abs(t) < 0.000001)
+            {
+                pos = 0;
+            }
+            else if((int)((t-a)/a)%1==0)
+            {
+                pos = (int)(((t - min) / a) - 1);
+            }
+            else
+            {
+                pos = (int)Math.Ceiling(((t - min) / a) - 1);
+            }
 			return pos;
 		}
 

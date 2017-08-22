@@ -16,14 +16,17 @@ namespace RouteBuilder
 
             Console.WriteLine("Welcome to Route Builder v1.0 by TyggerSoftware Inc.\n");
 
+            Console.WriteLine("Starting the program" + "\t\t\t\t" + System.DateTime.Now.ToString());
             NetworkReader nr = new NetworkReader("nodes.ty","links.ty");
             Console.WriteLine("Network loaded" +"\t\t\t\t\t"+ System.DateTime.Now.ToString());
 
             DataBaseReader dbr = new DataBaseReader("DetBT.ty");
             Console.WriteLine("BT database loaded" +"\t\t\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("");
 
 			DataBaseReader realDbr = new DataBaseReader("AllBT.ty");
 			Console.WriteLine("Real database loaded" + "\t\t\t\t" + System.DateTime.Now.ToString());
+            Console.WriteLine("");
 
             RealNetwork rn = new RealNetwork(nr.nodesInfo,nr.linksInfo);
             Console.WriteLine("Real network created" +"\t\t\t\t" + System.DateTime.Now.ToString());
@@ -39,6 +42,7 @@ namespace RouteBuilder
 
             else
             {
+                Console.WriteLine("Starting a set of experiments" + "\t\t\t" + System.DateTime.Now.ToString());
                 //Acá se prueban todos los experiments
             }
         }
