@@ -7,12 +7,12 @@ namespace RouteBuilder
         public static void Main(string[] args)
         {
             //Definitions (in seconds, in meters)
-            double newTripTime = 30 * 60;
+            double newTripTime = 90 * 60;
             double newVisitTime = 3 * 60;
             double T = 15 * 60;
             int k = 10;
             double radious = 25;
-            int version = 3;
+            int version = 2;
 
             Console.WriteLine("Welcome to Route Builder v1.0 by TyggerSoftware Inc.\n");
 
@@ -36,8 +36,8 @@ namespace RouteBuilder
             {
                 Console.WriteLine("Starting a single experiment" +"\t\t\t" + System.DateTime.Now.ToString());
                 Experiment exp = new Experiment(rn, dbr, realDbr, newTripTime, newVisitTime, T, k, radious, version);
-
-                exp.scenarios[0].export_inference_vehicles();
+                Console.WriteLine("\a\a\a\a\a\a\a\a\a\a\a\a\a\a\a\a\a\a");                                          
+                //exp.scenarios[0].export_inference_vehicles();
             }
 
             else

@@ -13,6 +13,16 @@ namespace RouteBuilder
         public double newVisitTime;
         public int K;
         public List<Vehicle> rVehicles;
+        public int totalInferencesSection;
+        public int totalInferencesTrip;
+        public double FPR_sections;
+        public double ER_sections;
+        public double CR_sections;
+        public double FPR2_sections;
+		public double FPR_trips;
+		public double ER_trips;
+		public double CR_trips;
+        public double FPR2_trips;
 
         //Constructor
         public Scenario(Network net, DetectionsDB dets, DetectionsDB rDets, double T, double newTripTime, double newVisitTime, int K)
@@ -393,17 +403,31 @@ namespace RouteBuilder
 			Console.Write("Infering routes...\t");
             foreach(Vehicle v in vehicles)
             {
+
                 foreach(Trip t in v.trips)
                 {
+
+                    t.obiously = 1;
                     foreach(Section s in t.sections)
                     {
                         if (s.paths.Count >= 2)
                         {
                             s.apply_BayesianInference(this, version);
+                            s.obiously = 0;
+                            t.obiously *= s.obiously;
                         }
 
                         else if (s.paths.Count == 1)
+                        {
                             s.apply_ObiouslyInference();
+                            s.obiously = 1;
+                            t.obiously *= s.obiously;
+                        }
+						else
+						{
+                            s.obiously = 1;
+                            t.obiously *= s.obiously;
+						}
                     }
                 }
 
@@ -453,12 +477,14 @@ namespace RouteBuilder
 		{
 			foreach (Vehicle v in rVehicles)
 			{
-				foreach (Trip t in v.trips)
+                foreach (Trip t in v.trips)
 				{
 					t.create_Routes(v.MAC);
 				}
 			}
 		}
+
+
 
         public double[] min_max_period_ID()
         {
@@ -642,6 +668,229 @@ namespace RouteBuilder
 			return null;
 		}
 
+		public Path export_in_path(int veh_mac, int sectionPos)
+		{
+			foreach (Vehicle v in this.rVehicles)
+			{
+				if (v.MAC == veh_mac)
+				{
+                    return v.trips[0].sections[sectionPos].paths[0];
+				}
+			}
+			return null;
+		}
+
+        public void set_choice_trip()
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Trip t in v.trips)
+                {
+                    Route choice = export_in_route(v.MAC);
+                    for (int i = 0; i < t.routes.Count;i++)
+                    {
+                        if (Route.Comparer(choice, t.routes[i]))
+                            t.choice = i;
+                    }
+                }
+            }
+        }
+
+        public void set_choice_section()
+        {
+			foreach (Vehicle v in vehicles)
+			{
+				foreach (Trip t in v.trips)
+				{
+                    for (int numSec = 0;numSec< t.sections.Count;numSec++)
+                    {
+                        Path choice = export_in_path(v.MAC, numSec);
+                        for (int i = 0; i < t.sections[numSec].paths.Count; i++)
+						{
+                            if (choice.Equals(t.sections[numSec].paths[i]))
+                                t.sections[numSec].choice = i;
+								
+						}
+                    }
+				}
+			}
+        }
+
+        public void set_choices()
+        {
+            set_choice_trip();
+            set_choice_section();
+        }
+
+        public void trimrRoutes()
+        {
+            foreach(Vehicle rv in rVehicles)
+            {
+                foreach(Vehicle v in vehicles)
+                {
+                    if(rv.MAC == v.MAC)
+                    {
+                        for (int i = 0; i < rv.trips.Count;i++)
+                        {
+                            if (v.trips[i].sections.Count > 0)
+                            {
+                                int startNode = v.trips[i].routes[0].nodes[0];
+                                int endNode = v.trips[i].routes[0].nodes[v.trips[i].routes[0].nodes.Count - 1];
+                                int startIndex = rv.trips[i].routes[0].nodes.IndexOf(startNode);
+                                for (int pos = 0; pos < startIndex; pos++)
+                                {
+                                    rv.trips[i].routes[0].nodes.RemoveAt(0);
+                                }
+                                rv.trips[i].routes[0].nodes.Reverse();
+                                int endIndex = rv.trips[i].routes[0].nodes.IndexOf(endNode);
+                                for (int pos = 0; pos < endIndex; pos++)
+                                {
+                                    rv.trips[i].routes[0].nodes.RemoveAt(0);
+                                }
+                                rv.trips[i].routes[0].nodes.Reverse();
+                            }
+                        }
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        public void calculate_statistics()
+        {
+            calculate_statistics_trip();
+            calculate_statistics_sections();
+        }
+
+        public void calculate_statistics_sections()
+        {
+            totalInferencesSection = 0;
+            FPR_sections = 0;
+            ER_sections = 0;
+            CR_sections = 0;
+            FPR2_sections = 0;
+            foreach(Vehicle v in this.vehicles)
+            {
+                foreach(Trip t in v.trips)
+                {
+                    foreach(Section s in t.sections)
+                    {
+                        if(s.obiously==0)
+                        {
+                            totalInferencesSection++;
+                            double max = 0;
+                            int maxpos = 0;
+                            for (int i = 0; i < s.paths.Count;i++)
+                            {
+                                if (s.paths[i].finalProb>max)
+                                {
+                                    max = s.paths[i].finalProb;
+                                    maxpos = i;
+                                }
+                            }
+                            ER_sections += max;
+                            CR_sections += 1.0 / s.paths.Count;
+                            if (maxpos == s.choice)
+                                FPR_sections++;
+
+                            List<Path> paths = new List<Path>();
+                            foreach(Path p in s.paths)
+                            {
+                                paths.Add(p);
+                            }
+
+                            paths.Sort((x, y) => x.finalProb.CompareTo(y.finalProb));
+                            paths.Reverse();
+                            if (paths[0].Equals(s.paths[s.choice]) || paths[1].Equals(s.paths[s.choice]))
+                                FPR2_sections++;
+
+                        }
+                    }
+                }
+            }
+        }
+
+        public void calculate_statistics_trip()
+        {
+            totalInferencesTrip = 0;
+            FPR_trips = 0;
+            ER_trips = 0;
+            CR_trips = 0;
+            FPR2_trips = 0;
+            foreach (Vehicle v in this.vehicles)
+            {
+                foreach (Trip t in v.trips)
+                {
+					if (v.MAC == 7626)
+					{ }
+                    if (t.obiously == 0)
+                    {
+                        totalInferencesTrip++;
+                        double max = -1;
+                        int maxpos = -1;
+                        for (int i = 0; i < t.routes.Count; i++)
+                        {
+                            if (t.routes[i].prob > max)
+                            {
+                                max = t.routes[i].prob;
+                                maxpos = i;
+                            }
+                        }
+                        ER_trips += max;
+                        CR_trips += 1.0 / t.routes.Count;
+                        if (maxpos == t.choice)
+                        {
+                            FPR_trips++;
+                            //Console.WriteLine(v.MAC);
+                        }
+
+						List<Route> routes = new List<Route>();
+                        foreach (Route r in t.routes)
+						{
+                            routes.Add(r);
+						}
+
+                        routes.Sort((x, y) => x.prob.CompareTo(y.prob));
+                        routes.Reverse();
+                        if (Route.Comparer(routes[0],t.routes[t.choice]) || Route.Comparer(routes[1], t.routes[t.choice]))
+							FPR2_trips++;
+
+					}
+                }
+            }
+        }
+
+        public void print_statistics()
+        {
+            Console.WriteLine("");
+            Console.WriteLine("Scenario Summaries");
+            Console.WriteLine("");
+            Console.WriteLine("SECTIONS");
+            Console.WriteLine("Total inferences: " + totalInferencesSection);
+            Console.WriteLine("FPR:  " + FPR_sections);
+            Console.WriteLine("FPR2: " + FPR2_sections);
+            Console.WriteLine("ER:   " + ER_sections);
+            Console.WriteLine("CR:   " + CR_sections);
+            Console.WriteLine("");
+			Console.WriteLine("TRIPS");
+			Console.WriteLine("Total inferences: " + totalInferencesTrip);
+            Console.WriteLine("FPR:  " + FPR_trips);
+            Console.WriteLine("FPR2: " + FPR2_trips);
+            Console.WriteLine("ER:   " + ER_trips);
+            Console.WriteLine("CR:   " + CR_trips);
+            Console.WriteLine("");
+            Console.WriteLine("Thanks for chose TyggerSoftware Inc. 2017");
+
+        }
+
+
+
+
+
+
+
+
         public void export_inference_vehicles()
         {
             int exitos = 0;
@@ -661,6 +910,7 @@ namespace RouteBuilder
                         if (Route.Comparer(t.get_mostProbably(), export_in_route(v.MAC)))
                         {
                             Console.WriteLine("SUCCESS");
+                            //Console.WriteLine(v.MAC);
                             exitos++;
                         }
                         else

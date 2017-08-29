@@ -53,9 +53,17 @@ namespace RouteBuilder
 			
             sc.assing_routes();
             sc.assing_rRoutes();
+            sc.trimrRoutes();
 			Console.WriteLine("All vehicle routes infered" + "\t\t\t" + System.DateTime.Now.ToString());
 
-            scenarios.Add(sc);
+            sc.set_choices();
+			Console.WriteLine("Choices assigned to vehicles" + "\t\t\t" + System.DateTime.Now.ToString());
+
+            sc.calculate_statistics();
+            sc.print_statistics();
+            sc.export_inference_vehicles();
+
+			scenarios.Add(sc);
         }
     }
 

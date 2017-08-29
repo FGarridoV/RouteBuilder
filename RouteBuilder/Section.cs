@@ -11,6 +11,8 @@ namespace RouteBuilder
         public double timeStart;
         public double timeEnd;
         public int period;
+        public int obiously;
+        public int choice;
 
         //Constructor without inference
         public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd, double T, int sCount, int eCount)
@@ -113,10 +115,20 @@ namespace RouteBuilder
                 p.set_fs_full(sc,period);
                 totalFlow += p.meanF;
 			}
-
-			foreach (Path p in paths)
+			if (totalFlow > 0)
 			{
-                p.set_P_ru(p.meanF/totalFlow);
+				foreach (Path p in paths)
+				{
+					p.set_P_ru(p.meanF / totalFlow);
+				}
+			}
+
+			else
+			{
+				foreach (Path p in paths)
+				{
+					p.set_P_ru(1 / paths.Count);
+				}
 			}
         }
 
@@ -215,7 +227,7 @@ namespace RouteBuilder
                 {
                     for (int j = 0; j < eqs[i].Length; j++)
                     {
-                        if (Math.Abs(eqs[i][j]) > 0.000001 && !Paths_in_others_eqs.Contains(j))
+                        if (Math.Abs(eqs[i][j]) > 0.000000000000000001 && !Paths_in_others_eqs.Contains(j))
                         {
                             Paths_in_others_eqs.Add(j);
                         }
@@ -225,7 +237,7 @@ namespace RouteBuilder
 
             for (int i = 0; i < eqs[posEq].Length; i++)
             {
-                if (Math.Abs(eqs[posEq][i]) > 0.000001 && !Paths_in_others_eqs.Contains(i))
+                if (Math.Abs(eqs[posEq][i]) > 0.000000000000000001 && !Paths_in_others_eqs.Contains(i))
                 {
                     paths[i].set_meanF(0);
                 }
@@ -286,61 +298,72 @@ namespace RouteBuilder
                         ress.Add(res);
                     }
                 }
+
                 if (equations.Count > 0)
                 {
-                    while (number_Xs(equations) > equations.Count)
+                    do
                     {
-                        int rank = 1;
-                        int nPath = f_times_repeat(equations, rank)[0];
-                        double[] DBv = sc.get_DB_Full_and_v(paths[nPath], period);
-                        rank++;
-                        while (Math.Abs(DBv[0]) < 0.000001 && rank <= number_Xs(equations) && f_times_repeat(equations, rank)[1] > 0)
+                        while (number_Xs(equations) > equations.Count)
                         {
-                            nPath = f_times_repeat(equations, rank)[0];
-                            DBv = sc.get_DB_Full_and_v(paths[nPath], period);
+                            int rank = 1;
+                            int nPath = f_times_repeat(equations, rank)[0];
+                            double[] DBv = sc.get_DB_Full_and_v(paths[nPath], period);
                             rank++;
-                        }
-                        paths[nPath].set_fs_full(sc, period);
-
-                        List<int> nPathsToProve = new List<int>(update_system_equations(equations, ress, nPath));
-
-                        while (nPathsToProve.Count > 0)
-                        {
-                            List<int> aux = new List<int>(update_system_equations(equations, ress, nPathsToProve[0]));
-                            nPathsToProve.RemoveAt(0);
-                            nPathsToProve.AddRange(aux);
-                        }
-
-                        while (deleteLD(equations, ress) == true){}
-
-                        for (int i = 0; i < ress.Count;i++)
-                        {
-                            if(Math.Abs(ress[i]) < 0.000001)
+                            while (Math.Abs(DBv[0]) < 0.000000000000000001 && rank <= number_Xs(equations) && f_times_repeat(equations, rank)[1] > 0)
                             {
-                                assing_flows_when_delete_eq(equations,i);
-                                ress.RemoveAt(i);
-                                equations.RemoveAt(i);
+                                nPath = f_times_repeat(equations, rank)[0];
+                                DBv = sc.get_DB_Full_and_v(paths[nPath], period);
+                                rank++;
                             }
+                            paths[nPath].set_fs_full(sc, period);
+
+                            List<int> nPathsToProve = new List<int>(update_system_equations(equations, ress, nPath));
+
+                            while (nPathsToProve.Count > 0)
+                            {
+                                List<int> aux = new List<int>(update_system_equations(equations, ress, nPathsToProve[0]));
+                                nPathsToProve.RemoveAt(0);
+                                nPathsToProve.AddRange(aux);
+                            }
+
+                            while (deleteLD(equations, ress) == true) { }
+
+                            for (int i = 0; i < ress.Count; i++)
+                            {
+                                if (Math.Abs(ress[i]) < 0.000000000000000001)
+                                {
+                                    assing_flows_when_delete_eq(equations, i);
+                                    ress.RemoveAt(i);
+                                    equations.RemoveAt(i);
+                                }
+                            }
+
+                            while (deleteEquals(equations, ress) == true) { }
+
+                            if (equations.Count == 0)
+                                break;
                         }
 
                         while (deleteEquals(equations, ress) == true) { }
 
                         if (equations.Count == 0)
                             break;
-
-
                     }
+                    while (number_Xs(equations) > equations.Count);
+
+
 
                     if (equations.Count > 0)
                     {
                         for (int i = 0; i < paths.Count; i++)
                         {
-                            if (Math.Abs(paths[i].meanF - -1) > 0.000001)
+                            if (Math.Abs(paths[i].meanF - -1) > 0.000000000000000001)
                             {
                                 add_cononicEquations(i, equations, ress);
                             }
                         }
 
+                        while (deleteEquals(equations, ress) == true) { }
                         while (deleteLD(equations, ress) == true) { }
 
                         double[] ressA = ress.ToArray();
@@ -379,8 +402,6 @@ namespace RouteBuilder
 
         public static bool deleteLD(List<double[]> equations, List<double> res)
         {
-            if(equations.Count==16 && equations[0].Length==12)
-            {}
             for (int i = 0; i < res.Count;i++)
             {
                 for (int j = 0; j < equations.Count;j++)
@@ -401,6 +422,8 @@ namespace RouteBuilder
 
         public static bool deleteEquals(List<double[]> equations, List<double> res)
 		{
+
+
 			for (int i = 0; i < equations.Count; i++)
 			{
 				for (int j = 0; j < equations.Count; j++)
@@ -422,30 +445,30 @@ namespace RouteBuilder
         public static bool areLD(double[] eq1, double[] eq2, double r1, double r2)
         {
             double ver=0;
-            if(Math.Abs(r1) > 0.000001 && Math.Abs(r2) > 0.000001)
+            if(Math.Abs(r1) > 0.000000000000000001 && Math.Abs(r2) > 0.000000000000000001)
                 ver = r1/r2;
             else
             {
                 for (int i = 0; i < eq1.Length; i++)
                 {
-                    if (Math.Abs(eq1[i]) > 0.000001 && Math.Abs(eq2[i]) > 0.000001)
+                    if (Math.Abs(eq1[i]) > 0.000000000000000001 && Math.Abs(eq2[i]) > 0.000000000000000001)
                         ver = eq1[i] / eq1[i];
                 }
             }
-            if(Math.Abs(ver) < 0.000001)
+            if(Math.Abs(ver) < 0.000000000000000001)
             {
                 return false;
             }
             for (int i = 0; i < eq1.Length;i++)
             {
-                if (Math.Abs(eq2[i]) > 0.000001)
+                if (Math.Abs(eq2[i]) > 0.000000000000000001)
                 {
-                    if (Math.Abs(eq1[i] / eq2[i] - ver) > 0.000001)
+                    if (Math.Abs(eq1[i] / eq2[i] - ver) > 0.000000000000000001)
                         return false;
                 }
                 else
                 {
-                    if (Math.Abs(eq1[i]) > 0.000001)
+                    if (Math.Abs(eq1[i]) > 0.000000000000000001)
                         return false;
                 }
             }
@@ -456,7 +479,7 @@ namespace RouteBuilder
         {
             for (int i = 0; i < eq1.Length; i++)
             {
-                if ((Math.Abs(eq1[i]) < 0.000001 && Math.Abs(eq2[i]) > 0.000001) || (Math.Abs(eq1[i]) > 0.000001 && Math.Abs(eq2[i]) < 0.000001))
+                if ((Math.Abs(eq1[i]) < 0.000000000000000001 && Math.Abs(eq2[i]) > 0.000000000000000001) || (Math.Abs(eq1[i]) > 0.000000000000000001 && Math.Abs(eq2[i]) < 0.000000000000000001))
                     return false;
             }
             return true;
@@ -552,7 +575,7 @@ namespace RouteBuilder
             int pathX = -1;
             foreach(int i in path_pos)
             {
-                if (Math.Abs(paths[i].meanF - -1) < 0.000001)
+                if (Math.Abs(paths[i].meanF - -1) < 0.000000000000000001)
                 {
                     num++;
                     pathX = i;
@@ -625,28 +648,35 @@ namespace RouteBuilder
                 verPru += p.P_routeUses;
                 verPt += p.P_routeUses;
             }
-            if(Math.Abs(verTotal) < 0.000001)
+            if(Math.Abs(verTotal) < 0.000000000000000001)
             {
-                if(Math.Abs(verPru) < 0.000001)
+                if (Math.Abs(verPt) < 0.000000000000000001 && Math.Abs(verPru) < 0.000000000000000001)
+				{
+					set_Pt_equi();
+                    set_P_ru_to_paths_equi();
+				}
+
+                else if(Math.Abs(verPru) < 0.000000000000000001)
                 {
                     set_P_ru_to_paths_equi();
                 }
+
+				else if (Math.Abs(verPt) < 0.000000000000000001)
+				{
+					set_Pt_equi();
+				}
 
                 else if(verPru>0)
                 {
                     foreach(Path p in paths)
                     {
-                        if (Math.Abs(p.meanF) < 0.000001)
+                        if (Math.Abs(p.meanF) < 0.000000000000000001)
                         {
                             p.set_meanF(0.0001);
                         }
                     }
                     set_P_ru_to_paths_with_flows();
 
-                }
-                else if(Math.Abs(verPt) < 0.000001)
-                {
-                    set_Pt_equi();
                 }
 
             }
@@ -663,7 +693,7 @@ namespace RouteBuilder
 
             }
 
-            if(Math.Abs(totalProb) < 0.000001)
+            if(Math.Abs(totalProb) < 0.000000000000000001)
             {
                 
             }

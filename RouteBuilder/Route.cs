@@ -8,6 +8,7 @@ namespace RouteBuilder
 		public List<int> nodes;
 		public double prob;
 
+
         public Route(int MAC, List<int> nodes, double prob)
         {
             this.MAC = MAC;
@@ -34,7 +35,6 @@ namespace RouteBuilder
 
             return text;
         }
-        /////BORRAR///
         public static bool Comparer(Route r1, Route r2)
         {
             if(r1.nodes.Count==r2.nodes.Count)

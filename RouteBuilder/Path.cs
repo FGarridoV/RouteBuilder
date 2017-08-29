@@ -200,8 +200,6 @@ namespace RouteBuilder
         public void set_P_ttt(double T_obs, int period)
         {
             this.set_TTT(period);
-            if(Math.Abs(T_obs - measure_error(period)) < 0.0000001)
-            {}
             this.P_totalTravelTime = this.TTT.integral(T_obs - measure_error(period), T_obs);
         }
 

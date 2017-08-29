@@ -13,6 +13,8 @@ namespace RouteBuilder
         public List<double> countsOnPassingNodes;
         public List<Section> sections;
         public List<Route> routes;
+        public int obiously;
+        public int choice;
 
         //Constructor
         public Trip()

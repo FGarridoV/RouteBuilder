@@ -68,7 +68,7 @@ namespace RouteBuilder
             {
                 pos = 0;
             }
-            else if((int)((t-a)/a)%1==0)
+            else if(Math.Abs(((t - a) / a) % 1) < 0.0000001)
             {
                 pos = (int)(((t - min) / a) - 1);
             }
