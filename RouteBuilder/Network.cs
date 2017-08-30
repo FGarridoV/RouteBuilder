@@ -36,6 +36,26 @@ namespace RouteBuilder
             }
         }
 
+        public void add_flowsRealAll_to_link(int tailnode,int headnode)
+        {
+            LinkByNodesID(tailnode,headnode).RealCountAllVehicles++; 
+        }
+
+        public void add_flowsRealInfer_to_link(int tailnode, int headnode)
+		{
+            LinkByNodesID(tailnode, headnode).RealCountInferencedVehicles++;
+		}
+
+        public void add_flowsEstAll_to_link(int tailnode, int headnode, double val)
+		{
+            LinkByNodesID(tailnode, headnode).EstimatedCountAllVehicles+=val;
+		}
+
+        public void add_flowsEstInfer_to_link(int tailnode, int headnode, double val)
+		{
+			LinkByNodesID(tailnode, headnode).RealCountAllVehicles+=val;
+		}
+
         //Constructor to make copies
 		public Network(Network net)
 		{
@@ -252,7 +272,9 @@ namespace RouteBuilder
 					l.mainCost = l.angularCost;
 				}
 			}
-        }        
+        }  
+
+         
 
         //Method 11: Determine Kht shortest path
         public List<Path> YenKsP(int sourceNodeID, int sinkNodeID, int K, int costType)
@@ -317,18 +339,54 @@ namespace RouteBuilder
                     break;
 
                 B.Sort();
-                A.Add(B[0]);
-                B.RemoveAt(0);
+                for (int vec = 0; vec < B.Count; vec++)
+                {
+                    bool isNew = true;
+                    for (int aPos = 0; aPos < A.Count;aPos++)
+                    {
+                        if (B[vec].Equals(A[aPos]))
+                        {
+                            isNew = false;
+                            break;
+                        }
+                            
+                    }
+                    if (isNew)
+                    {
+                        A.Add(B[vec]);
+                        B.RemoveAt(vec);
+                        break;
+                    }
+                }
+
+              
+
                 for (int q = 0; q < B.Count;q++)
                 {
                     if (Math.Abs(A[A.Count - 1].totalCost - B[q].totalCost) < 0.00001)
                     {
-                        A.Add(B[q]);
-                        B.RemoveAt(q);
+						bool isNew = true;
+						for (int aPos = 0; aPos < A.Count; aPos++)
+						{
+							if (B[q].Equals(A[aPos]))
+							{
+								isNew = false;
+								break;
+							}
+
+						}
+
+                        if (isNew)
+                        {
+                            A.Add(B[q]);
+                            B.RemoveAt(q);
+                        }
                     }
+
                     else
                         break;
                 }
+
 
                 if(A.Count == K)
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace RouteBuilder
 {
@@ -129,6 +130,8 @@ namespace RouteBuilder
 			Console.Write("Determinung subpaths...\t");
 			foreach (Vehicle v in vehicles)
 			{
+				if (v.MAC == 7626)
+				{ }
                 v.add_tripOptions(network ,K, T);
 
                 if (i == (int)((vehicles.Count - 1) * j / 100))
@@ -811,6 +814,49 @@ namespace RouteBuilder
             }
         }
 
+        public void estimating_flows()
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                foreach (Trip t in v.trips)
+                {
+                    foreach (Route r in t.routes)
+                    {
+                        for (int i = 0; i < r.nodes.Count - 1;i++)
+                        {
+                            if(t.routes.Count>1)
+                                this.network.add_flowsEstInfer_to_link(r.nodes[i], r.nodes[i + 1], r.prob);
+
+                            if(t.routes.Count>0)
+                                this.network.add_flowsEstAll_to_link(r.nodes[i],r.nodes[i+1],r.prob);
+                        }
+                    }
+                }
+            }
+
+            foreach(Vehicle rv in rVehicles)
+            {
+                foreach(Vehicle v in vehicles)
+                {
+                    if(rv.MAC == v.MAC)
+                    {
+                        foreach(Trip t in rv.trips)
+                        {
+                            for (int i = 0; i < t.routes[0].nodes.Count - 1; i++)
+							{
+                                if (v.trips[0].routes.Count > 1)
+                                    this.network.add_flowsRealInfer_to_link(t.routes[0].nodes[i], t.routes[0].nodes[i + 1]);
+
+								if (v.trips[0].routes.Count > 0)
+									this.network.add_flowsRealAll_to_link(t.routes[0].nodes[i], t.routes[0].nodes[i + 1]);
+							}
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
         public void calculate_statistics_trip()
         {
             totalInferencesTrip = 0;
@@ -866,12 +912,17 @@ namespace RouteBuilder
             Console.WriteLine("");
             Console.WriteLine("Scenario Summaries");
             Console.WriteLine("");
+            Console.WriteLine("Total of vehicles entered: "+ rVehicles.Count);
+            Console.WriteLine("Total of vehicles detected: " + vehicles.Count);
+            Console.WriteLine("");
             Console.WriteLine("SECTIONS");
             Console.WriteLine("Total inferences: " + totalInferencesSection);
             Console.WriteLine("FPR:  " + FPR_sections);
             Console.WriteLine("FPR2: " + FPR2_sections);
             Console.WriteLine("ER:   " + ER_sections);
             Console.WriteLine("CR:   " + CR_sections);
+            Console.WriteLine("FPR RATIO:   " + FPR_sections/totalInferencesSection);
+			Console.WriteLine("FPR2 RATIO:   " + FPR2_sections/totalInferencesSection);
             Console.WriteLine("");
 			Console.WriteLine("TRIPS");
 			Console.WriteLine("Total inferences: " + totalInferencesTrip);
@@ -879,10 +930,60 @@ namespace RouteBuilder
             Console.WriteLine("FPR2: " + FPR2_trips);
             Console.WriteLine("ER:   " + ER_trips);
             Console.WriteLine("CR:   " + CR_trips);
+			Console.WriteLine("FPR RATIO:   " + FPR_trips / totalInferencesTrip);
+			Console.WriteLine("FPR2 RATIO:   " + FPR2_trips / totalInferencesTrip);
             Console.WriteLine("");
+            Console.WriteLine("FLOWS");
+            Console.WriteLine("Link\tTail\tHead\tRealAll\tEstAll\tRealInfer\tEstInfer");
+            foreach(Link l in network.links)
+            {
+                Console.WriteLine(l.ID+"\t"+l.tailNode.ID+"\t"+l.headNode.ID+"\t"+l.RealCountAllVehicles+"\t"+l.EstimatedCountAllVehicles+"\t"+l.RealCountInferencedVehicles+"\t"+l.EstimatedCountInferencedVehicles);
+            }
+
             Console.WriteLine("Thanks for chose TyggerSoftware Inc. 2017");
 
         }
+
+		public void write_statistics()
+		{
+            StreamWriter sw = new StreamWriter("Summary.txt");
+
+			sw.WriteLine("");
+			sw.WriteLine("Scenario Summaries");
+			sw.WriteLine("");
+			sw.WriteLine("Total of vehicles entered: " + rVehicles.Count);
+			sw.WriteLine("Total of vehicles detected: " + vehicles.Count);
+			sw.WriteLine("");
+			sw.WriteLine("SECTIONS");
+			sw.WriteLine("Total inferences: " + totalInferencesSection);
+			sw.WriteLine("FPR:  " + FPR_sections);
+			sw.WriteLine("FPR2: " + FPR2_sections);
+			sw.WriteLine("ER:   " + ER_sections);
+			sw.WriteLine("CR:   " + CR_sections);
+			sw.WriteLine("FPR RATIO:   " + FPR_sections / totalInferencesSection);
+			sw.WriteLine("FPR2 RATIO:   " + FPR2_sections / totalInferencesSection);
+			sw.WriteLine("");
+			sw.WriteLine("TRIPS");
+			sw.WriteLine("Total inferences: " + totalInferencesTrip);
+			sw.WriteLine("FPR:  " + FPR_trips);
+			sw.WriteLine("FPR2: " + FPR2_trips);
+			sw.WriteLine("ER:   " + ER_trips);
+			sw.WriteLine("CR:   " + CR_trips);
+			sw.WriteLine("FPR RATIO:   " + FPR_trips / totalInferencesTrip);
+			sw.WriteLine("FPR2 RATIO:   " + FPR2_trips / totalInferencesTrip);
+			sw.WriteLine("");
+			sw.WriteLine("FLOWS");
+			sw.WriteLine("Link\tTail\tHead\tRealAll\tEstAll\tRealInfer\tEstInfer");
+			foreach (Link l in network.links)
+			{
+				sw.WriteLine(l.ID + "\t" + l.tailNode.ID + "\t" + l.headNode.ID + "\t" + l.RealCountAllVehicles + "\t" + l.EstimatedCountAllVehicles + "\t" + l.RealCountInferencedVehicles + "\t" + l.EstimatedCountInferencedVehicles);
+			}
+
+			sw.WriteLine("Thanks for chose TyggerSoftware Inc. 2017");
+
+            sw.Close();
+
+		}
 
 
 

@@ -61,7 +61,8 @@ namespace RouteBuilder
 
             sc.calculate_statistics();
             sc.print_statistics();
-            sc.export_inference_vehicles();
+            sc.write_statistics();
+            //sc.export_inference_vehicles();
 
 			scenarios.Add(sc);
         }

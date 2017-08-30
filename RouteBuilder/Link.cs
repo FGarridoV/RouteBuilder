@@ -13,6 +13,11 @@ namespace RouteBuilder
         public double angularCost;
         public double mainCost;
         public List<TravelTimes> tTimes;
+        public double RealCountInferencedVehicles;
+        public double RealCountAllVehicles;
+		public double EstimatedCountInferencedVehicles;
+		public double EstimatedCountAllVehicles;
+
 
         //Constructor from a RealLink
         public Link(RealLink l)
@@ -21,6 +26,10 @@ namespace RouteBuilder
             this.distanceCost = l.dijkstraDistance;
             this.edgesCost = l.dijkstraNodes;
             this.tTimes = new List<TravelTimes>();
+            RealCountInferencedVehicles = 0;
+            RealCountAllVehicles = 0;
+            EstimatedCountInferencedVehicles = 0;
+            EstimatedCountAllVehicles = 0;
         }
 
         //Constructor to make copies
@@ -32,6 +41,10 @@ namespace RouteBuilder
             this.angularCost = l.angularCost;
             this.mainCost = l.mainCost;
 			this.tTimes = new List<TravelTimes>();
+			RealCountInferencedVehicles = 0;
+			RealCountAllVehicles = 0;
+			EstimatedCountInferencedVehicles = 0;
+			EstimatedCountAllVehicles = 0;
         }
 
         //Method 1: Add the tail node element
