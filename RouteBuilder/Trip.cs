@@ -15,6 +15,9 @@ namespace RouteBuilder
         public List<Route> routes;
         public int obiously;
         public int choice;
+        public int mostProbably;
+        public int secondBest;
+        public Random rnd;
 
         //Constructor
         public Trip()
@@ -26,6 +29,7 @@ namespace RouteBuilder
             sections = new List<Section>();
             countsOnPassingNodes = new List<double>();
             routes = new List<Route>();
+            rnd = new Random();
         }
 
         //Method 1: Add a detection
@@ -66,6 +70,50 @@ namespace RouteBuilder
                     countsOnPassingNodes.Add(auxN);
                 }
             }
+        }
+
+        public void set_mostProbRoutes()
+        {
+			List<int> candidates = new List<int>();
+
+			List<Route> routess  = new List<Route>();
+            foreach (Route r in routes)
+			{
+				routess.Add(r);
+			}
+            routess.Sort((x, y) => x.prob.CompareTo(y.prob));
+			routess.Reverse();
+
+			for (int i = 0; i < routes.Count; i++)
+			{
+				if (Math.Abs(routes[0].prob - routess[0].prob) < 0.00000001)
+				{
+					candidates.Add(i);
+				}
+			}
+
+			int rand = rnd.Next(0, candidates.Count);
+			mostProbably = rand;
+			candidates.Remove(rand);
+
+			if (candidates.Count > 0)
+			{
+				rand = rnd.Next(0, candidates.Count);
+				secondBest = rand;
+			}
+			else
+			{
+				for (int i = 0; i < routes.Count; i++)
+				{
+					if (Math.Abs(routes[0].prob - routess[1].prob) < 0.00000001)
+					{
+						candidates.Add(i);
+					}
+				}
+				rand = rnd.Next(0, candidates.Count);
+				secondBest = rand;
+				candidates.Remove(rand);
+			}
         }
 
         public int sCounts(double time)

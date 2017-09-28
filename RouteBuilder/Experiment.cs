@@ -60,9 +60,11 @@ namespace RouteBuilder
 			Console.WriteLine("Choices assigned to vehicles" + "\t\t\t" + System.DateTime.Now.ToString());
 
             sc.calculate_statistics();
+            sc.estimating_flows();
             sc.print_statistics();
             sc.write_statistics();
-            //sc.export_inference_vehicles();
+            sc.export_inference_vehicles();
+            sc.correctr();
 
 			scenarios.Add(sc);
         }

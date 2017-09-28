@@ -53,7 +53,7 @@ namespace RouteBuilder
 
         public void add_flowsEstInfer_to_link(int tailnode, int headnode, double val)
 		{
-			LinkByNodesID(tailnode, headnode).RealCountAllVehicles+=val;
+            LinkByNodesID(tailnode, headnode).EstimatedCountInferencedVehicles+=val;
 		}
 
         //Constructor to make copies

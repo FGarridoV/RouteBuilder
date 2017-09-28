@@ -13,6 +13,9 @@ namespace RouteBuilder
         public int period;
         public int obiously;
         public int choice;
+        public int MostProbably;
+        public int SecondBest;
+        public Random rnd;
 
         //Constructor without inference
         public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd, double T, int sCount, int eCount)
@@ -26,6 +29,7 @@ namespace RouteBuilder
             this.timeStart = timeStart;
             this.timeEnd = timeEnd;
             this.period = (int)Math.Ceiling(timeStart / T);
+            rnd = new Random();
 
 			foreach (Path pa in paths)
 			{
@@ -38,6 +42,7 @@ namespace RouteBuilder
         public Section(Network net, int nodeSource, int nodeSink, int k, double timeStart, double timeEnd, double T, int sCount, int eCount)
         {
             this.paths = new List<Path>();
+            rnd = new Random();
 
             List<Path> p1 = new List<Path>(net.YenKsP(nodeSource, nodeSink, k, 0));
             foreach (Path p in p1)
@@ -90,6 +95,53 @@ namespace RouteBuilder
             }
             return true;
         }
+
+        public void set_mostProbRoutes()
+        {
+            List<int> candidates = new List<int>();
+
+            List<Path> pathss = new List<Path>();
+            foreach (Path p in paths)
+            {
+                pathss.Add(p);
+            }
+            pathss.Sort((x, y) => x.finalProb.CompareTo(y.finalProb));
+            pathss.Reverse();
+
+            for (int i = 0; i < paths.Count; i++)
+            {
+                if (Math.Abs(paths[0].finalProb - pathss[0].finalProb) < 0.00000001)
+                {
+                    candidates.Add(i);
+                }
+            }
+
+            int rand = rnd.Next(0, candidates.Count);
+            MostProbably = rand;
+            candidates.Remove(rand);
+
+            if (candidates.Count > 0)
+            {
+                rand = rnd.Next(0, candidates.Count);
+                SecondBest = rand;
+            }
+            else
+            {
+                for (int i = 0; i < paths.Count; i++)
+                {
+                    if (Math.Abs(paths[0].finalProb - pathss[1].finalProb) < 0.00000001)
+                    {
+                        candidates.Add(i);
+                    }
+                }
+                rand = rnd.Next(0, candidates.Count);
+                SecondBest = rand;
+                candidates.Remove(rand);
+            }
+        }
+
+
+
 
         public void set_P_ttt_to_paths()
         {
@@ -216,6 +268,14 @@ namespace RouteBuilder
 			options.Sort((x, y) => x.distance.CompareTo(y.distance));
             options[0].set_P_ru(1);
 		}
+
+        public void set_P_total_equals()
+        {
+            foreach(Path p in this.paths)
+            {
+                p.set_final_prob(1.0/paths.Count);
+            }
+        }
 
         public void assing_flows_when_delete_eq(List<double[]> eqs, int posEq)
         {
@@ -635,8 +695,10 @@ namespace RouteBuilder
                 set_P_ru_to_paths_complete(sc);
             else if (version == 4)
                 set_P_ru_to_paths_chung2014();
-            else
+            else if (version == 5)
                 set_P_ru_to_paths_chung2017();
+            else
+                set_P_total_equals();
 
 
             double verTotal = 0;
@@ -646,7 +708,7 @@ namespace RouteBuilder
             {
                 verTotal += p.P_totalTravelTime*p.P_missedDetections*p.P_routeUses;
                 verPru += p.P_routeUses;
-                verPt += p.P_routeUses;
+                verPt += p.P_totalTravelTime;
             }
             if(Math.Abs(verTotal) < 0.000000000000000001)
             {

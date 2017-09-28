@@ -406,7 +406,6 @@ namespace RouteBuilder
 			Console.Write("Infering routes...\t");
             foreach(Vehicle v in vehicles)
             {
-
                 foreach(Trip t in v.trips)
                 {
 
@@ -701,22 +700,23 @@ namespace RouteBuilder
 
         public void set_choice_section()
         {
-			foreach (Vehicle v in vehicles)
-			{
-				foreach (Trip t in v.trips)
-				{
-                    for (int numSec = 0;numSec< t.sections.Count;numSec++)
+            foreach (Vehicle v in vehicles)
+            {
+                foreach (Trip t in v.trips)
+                {
+                    for (int numSec = 0; numSec < t.sections.Count; numSec++)
                     {
                         Path choice = export_in_path(v.MAC, numSec);
                         for (int i = 0; i < t.sections[numSec].paths.Count; i++)
-						{
+                        {
                             if (choice.Equals(t.sections[numSec].paths[i]))
                                 t.sections[numSec].choice = i;
-								
-						}
+
+                        }
                     }
-				}
-			}
+                }
+            }
+
         }
 
         public void set_choices()
@@ -762,8 +762,8 @@ namespace RouteBuilder
 
         public void calculate_statistics()
         {
-            calculate_statistics_trip();
-            calculate_statistics_sections();
+            calculate_statistics_trip_new_version();
+            calculate_statistics_section_new_version();
         }
 
         public void calculate_statistics_sections()
@@ -775,39 +775,37 @@ namespace RouteBuilder
             FPR2_sections = 0;
             foreach(Vehicle v in this.vehicles)
             {
-                foreach(Trip t in v.trips)
+                foreach (Trip t in v.trips)
                 {
-                    foreach(Section s in t.sections)
+                    if (t.passingNodes.Count > 1)
                     {
-                        if(s.obiously==0)
+                        foreach (Section s in t.sections)
                         {
-                            totalInferencesSection++;
-                            double max = 0;
-                            int maxpos = 0;
-                            for (int i = 0; i < s.paths.Count;i++)
+                            if (s.obiously == 0)
                             {
-                                if (s.paths[i].finalProb>max)
+                                totalInferencesSection++;
+                                List<Path> pathss = new List<Path>();
+                                foreach (Path p in s.paths)
                                 {
-                                    max = s.paths[i].finalProb;
-                                    maxpos = i;
+                                    pathss.Add(p);
                                 }
+                                pathss.Sort((x, y) => x.finalProb.CompareTo(y.finalProb));
+                                pathss.Reverse();
+
+                                if (pathss[0].Equals(s.paths[s.choice]) || pathss[1].Equals(s.paths[s.choice]))
+                                {
+                                    FPR2_sections++;
+                                }
+
+                                if (pathss[0].Equals(s.paths[s.choice]))
+                                {
+                                    FPR_sections++;
+                                }
+
+                                ER_sections += pathss[0].finalProb;
+                                CR_sections += 1.0 / pathss.Count;
+
                             }
-                            ER_sections += max;
-                            CR_sections += 1.0 / s.paths.Count;
-                            if (maxpos == s.choice)
-                                FPR_sections++;
-
-                            List<Path> paths = new List<Path>();
-                            foreach(Path p in s.paths)
-                            {
-                                paths.Add(p);
-                            }
-
-                            paths.Sort((x, y) => x.finalProb.CompareTo(y.finalProb));
-                            paths.Reverse();
-                            if (paths[0].Equals(s.paths[s.choice]) || paths[1].Equals(s.paths[s.choice]))
-                                FPR2_sections++;
-
                         }
                     }
                 }
@@ -857,6 +855,70 @@ namespace RouteBuilder
             }
         }
 
+        public void calculate_statistics_trip_new_version()
+        {
+			totalInferencesTrip = 0;
+			FPR_trips = 0;
+			ER_trips = 0;
+			CR_trips = 0;
+			FPR2_trips = 0;
+
+            foreach (Vehicle v in this.vehicles)
+            {
+                foreach (Trip t in v.trips)
+                {
+                    if (t.passingNodes.Count > 1)
+                    {
+                        if (t.obiously == 0)
+                        {
+                            t.set_mostProbRoutes();
+                            totalInferencesTrip++;
+                            if (t.choice == t.mostProbably)
+                                FPR_trips++;
+                            if (t.choice == t.mostProbably || t.choice == t.secondBest)
+                                FPR2_trips++;
+                            ER_trips += t.routes[t.mostProbably].prob;
+                            CR_trips += 1.0 / t.routes.Count;
+
+                        }
+                    }
+                }
+            }
+        }
+
+		public void calculate_statistics_section_new_version()
+		{
+            totalInferencesSection = 0;
+            FPR_sections = 0;
+            ER_sections = 0;
+            CR_sections = 0;
+            FPR2_sections = 0;
+
+			foreach (Vehicle v in this.vehicles)
+			{
+				foreach (Trip t in v.trips)
+				{
+					if (t.passingNodes.Count > 1)
+					{
+                        foreach (Section s in t.sections)
+                        {
+                            if (s.obiously == 0)
+                            {
+                                s.set_mostProbRoutes();
+                                totalInferencesSection++;
+                                if (s.choice == s.MostProbably)
+                                    FPR_sections++;
+                                if (s.choice == s.MostProbably || s.choice == s.SecondBest)
+                                    FPR2_sections++;
+                                ER_sections += s.paths[s.MostProbably].finalProb;
+                                CR_sections += 1.0 / s.paths.Count;
+                            }
+                        }
+					}
+				}
+			}
+		}
+
         public void calculate_statistics_trip()
         {
             totalInferencesTrip = 0;
@@ -868,41 +930,33 @@ namespace RouteBuilder
             {
                 foreach (Trip t in v.trips)
                 {
-					if (v.MAC == 7626)
-					{ }
-                    if (t.obiously == 0)
+                    if (t.passingNodes.Count > 1)
                     {
-                        totalInferencesTrip++;
-                        double max = -1;
-                        int maxpos = -1;
-                        for (int i = 0; i < t.routes.Count; i++)
+                        if (t.obiously == 0)
                         {
-                            if (t.routes[i].prob > max)
+                            totalInferencesTrip++;
+                            List<Route> rutes = new List<Route>();
+                            foreach (Route r in t.routes)
                             {
-                                max = t.routes[i].prob;
-                                maxpos = i;
+                                rutes.Add(r);
                             }
+                            rutes.Sort((x, y) => x.prob.CompareTo(y.prob));
+                            rutes.Reverse();
+
+                            if (Route.Comparer(rutes[0], t.routes[t.choice]) || Route.Comparer(rutes[1], t.routes[t.choice]))
+                            {
+                                FPR2_trips++;
+                            }
+
+                            if (Route.Comparer(rutes[0], t.routes[t.choice]))
+                            {
+                                FPR_trips++;
+                            }
+
+                            ER_trips += rutes[0].prob;
+                            CR_trips += 1.0 / rutes.Count;
                         }
-                        ER_trips += max;
-                        CR_trips += 1.0 / t.routes.Count;
-                        if (maxpos == t.choice)
-                        {
-                            FPR_trips++;
-                            //Console.WriteLine(v.MAC);
-                        }
-
-						List<Route> routes = new List<Route>();
-                        foreach (Route r in t.routes)
-						{
-                            routes.Add(r);
-						}
-
-                        routes.Sort((x, y) => x.prob.CompareTo(y.prob));
-                        routes.Reverse();
-                        if (Route.Comparer(routes[0],t.routes[t.choice]) || Route.Comparer(routes[1], t.routes[t.choice]))
-							FPR2_trips++;
-
-					}
+                    }
                 }
             }
         }
@@ -985,15 +1039,9 @@ namespace RouteBuilder
 
 		}
 
-
-
-
-
-
-
-
         public void export_inference_vehicles()
         {
+            StreamWriter sw = new StreamWriter("Details.txt");
             int exitos = 0;
             int fracasos = 0;
             foreach(Vehicle v in vehicles)
@@ -1002,28 +1050,90 @@ namespace RouteBuilder
                 {
                     if(t.routes.Count>1)
                     {
-                        Console.WriteLine("---------- " + v.MAC + " ----------");
+                        sw.WriteLine("---------- " + v.MAC + " ----------");
                         foreach(Route r in t.routes)
                         {
-                            Console.WriteLine("Route: " + r.export_route());
+                            sw.WriteLine("Route: " + r.export_route());
                         }
-                        Console.WriteLine(get_realRoute(v.MAC));
+                        sw.WriteLine(get_realRoute(v.MAC));
                         if (Route.Comparer(t.get_mostProbably(), export_in_route(v.MAC)))
                         {
-                            Console.WriteLine("SUCCESS");
+                            sw.WriteLine("SUCCESS");
                             //Console.WriteLine(v.MAC);
                             exitos++;
                         }
                         else
                         {
-                            Console.WriteLine("FAIL");
+                            sw.WriteLine("FAIL");
                             fracasos++;
                         }
-                        Console.WriteLine("----------" + "---" + "----------");
+                        sw.WriteLine("----------" + "---" + "----------");
                     }
                 }
             }
-            Console.WriteLine("Program ended, RATIO: " + (exitos/(double)(exitos + fracasos)*100) + "%   Total is: "+(exitos + fracasos));
+            sw.WriteLine("Program ended, RATIO: " + (exitos/(double)(exitos + fracasos)*100) + "%   Total is: "+(exitos + fracasos));
+            sw.Close();
+        }
+
+		public void write_inference_vehicles()
+		{
+			int exitos = 0;
+			int fracasos = 0;
+			foreach (Vehicle v in vehicles)
+			{
+				foreach (Trip t in v.trips)
+				{
+					if (t.routes.Count > 1)
+					{
+						Console.WriteLine("---------- " + v.MAC + " ----------");
+						foreach (Route r in t.routes)
+						{
+							Console.WriteLine("Route: " + r.export_route());
+						}
+						Console.WriteLine(get_realRoute(v.MAC));
+						if (Route.Comparer(t.get_mostProbably(), export_in_route(v.MAC)))
+						{
+							Console.WriteLine("SUCCESS");
+							//Console.WriteLine(v.MAC);
+							exitos++;
+						}
+						else
+						{
+							Console.WriteLine("FAIL");
+							fracasos++;
+						}
+						Console.WriteLine("----------" + "---" + "----------");
+					}
+				}
+			}
+			Console.WriteLine("Program ended, RATIO: " + (exitos / (double)(exitos + fracasos) * 100) + "%   Total is: " + (exitos + fracasos));
+		}
+
+        public void correctr()
+        {
+            int sec = 0;
+            int trp = 0;
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Section s in v.trips[0].sections)
+                {
+                    if(s.paths.Count>1)
+                    {
+                        sec++;
+                        //Console.WriteLine(v.MAC);
+                    }
+                }
+
+                if(v.trips[0].routes.Count>1)
+                {
+                    trp++;
+                    Console.WriteLine(v.MAC);
+                }
+                    
+            }
+            Console.WriteLine("trp " + trp);
+            Console.WriteLine("sec " + sec);
+
         }
     }
 
