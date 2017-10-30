@@ -18,6 +18,7 @@ namespace RouteBuilder
         public int mostProbably;
         public int secondBest;
         public Random rnd;
+        public bool hasLoop;
 
         //Constructor
         public Trip()
@@ -30,6 +31,7 @@ namespace RouteBuilder
             countsOnPassingNodes = new List<double>();
             routes = new List<Route>();
             rnd = new Random();
+            hasLoop = false;
         }
 
         //Method 1: Add a detection
@@ -114,6 +116,11 @@ namespace RouteBuilder
 				secondBest = rand;
 				candidates.Remove(rand);
 			}
+        }
+
+        public void it_has_loop()
+        {
+            
         }
 
         public int sCounts(double time)
