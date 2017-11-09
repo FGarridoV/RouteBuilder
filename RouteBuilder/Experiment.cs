@@ -33,10 +33,13 @@ namespace RouteBuilder
             Scenario sc = new Scenario(modelNet,DB,rDB,T,newTripTime,newVisitTime,K);
             Console.WriteLine("New scenario created" + "\t\t\t\t" + System.DateTime.Now.ToString());
 			
+            sc.delete_car_no_inferenciable();
             sc.add_travels_all_vehicles();
             sc.add_travels_all_rVehicles();
 			Console.WriteLine("Vehicle trips assigned" + "\t\t\t\t" + System.DateTime.Now.ToString());
-			
+
+            //sc.delete_cars();
+
             sc.add_times_to_nodes_and_links();
 			Console.WriteLine("Dwell and travel times loaded" + "\t\t\t" + System.DateTime.Now.ToString());
 
@@ -53,19 +56,21 @@ namespace RouteBuilder
 			
             sc.assing_routes();
             sc.assing_rRoutes();
-            sc.trimrRoutes();
 			Console.WriteLine("All vehicle routes infered" + "\t\t\t" + System.DateTime.Now.ToString());
+            sc.trimrRoutes();
 
             sc.set_choices();
 			Console.WriteLine("Choices assigned to vehicles" + "\t\t\t" + System.DateTime.Now.ToString());
 
+            sc.set_equalsPercent();
             sc.calculate_statistics();
             sc.estimating_flows();
             sc.print_statistics();
             sc.write_statistics();
             sc.export_inference_vehicles();
+            sc.set_speedCats();
+            sc.export_2_DB();
             sc.correctr();
-
 			scenarios.Add(sc);
         }
     }

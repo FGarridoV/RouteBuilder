@@ -16,6 +16,7 @@ namespace RouteBuilder
         public int MostProbably;
         public int SecondBest;
         public Random rnd;
+        public double SpeedCat;
 
         //Constructor without inference
         public Section(Network net, int nodeSource, int nodeSink, double timeStart, double timeEnd, double T, int sCount, int eCount)
@@ -110,7 +111,7 @@ namespace RouteBuilder
 
             for (int i = 0; i < paths.Count; i++)
             {
-                if (Math.Abs(paths[0].finalProb - pathss[0].finalProb) < 0.00000001)
+                if (Math.Abs(paths[i].finalProb - pathss[0].finalProb) < 0.00000001)
                 {
                     candidates.Add(i);
                 }
@@ -129,7 +130,7 @@ namespace RouteBuilder
             {
                 for (int i = 0; i < paths.Count; i++)
                 {
-                    if (Math.Abs(paths[0].finalProb - pathss[1].finalProb) < 0.00000001)
+                    if (Math.Abs(paths[i].finalProb - pathss[1].finalProb) < 0.00000001)
                     {
                         candidates.Add(i);
                     }
@@ -799,6 +800,13 @@ namespace RouteBuilder
                     p.add_count_nodes_id(counts);
                 }
             }
+        }
+
+        public void set_speedCat()
+        {
+            double distance = paths[choice].distance;
+            double time = this.timeEnd - this.timeStart;
+            SpeedCat = (double)distance / (double)time;
         }
     }
 }

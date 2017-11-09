@@ -19,6 +19,10 @@ namespace RouteBuilder
         public int secondBest;
         public Random rnd;
         public bool hasLoop;
+        public double percSimilDist;
+        public double percDifDist;
+        public double percSimilLink;
+        public double percDifLink;
 
         //Constructor
         public Trip()
@@ -88,11 +92,15 @@ namespace RouteBuilder
 
 			for (int i = 0; i < routes.Count; i++)
 			{
-				if (Math.Abs(routes[0].prob - routess[0].prob) < 0.00000001)
+				if (Math.Abs(routes[i].prob - routess[0].prob) < 0.00000000001)
 				{
 					candidates.Add(i);
 				}
 			}
+            if(candidates.Count>1)
+            {
+                Console.WriteLine("");
+            }
 
 			int rand = rnd.Next(0, candidates.Count);
 			mostProbably = rand;
@@ -107,7 +115,7 @@ namespace RouteBuilder
 			{
 				for (int i = 0; i < routes.Count; i++)
 				{
-					if (Math.Abs(routes[0].prob - routess[1].prob) < 0.00000001)
+					if (Math.Abs(routes[i].prob - routess[1].prob) < 0.00000001)
 					{
 						candidates.Add(i);
 					}
@@ -253,6 +261,54 @@ namespace RouteBuilder
             }
 
             return routes[maxPos];
+        }
+
+        public void set_percSimil_Dif(Network net)
+        {
+            
+            List<int> rRoute = routes[choice].nodes;
+            List<int> iRoute = routes[mostProbably].nodes;
+            if (iRoute.Count >= 2)
+            {
+                int totalLink = 0;
+                double totalDist = 0;
+                int linkDif = 0;
+                double distDif = 0;
+                int linkEq = 0;
+                double distEq = 0;
+                bool ver;
+
+                for (int i = 0; i < iRoute.Count - 1; i++)
+                {
+                    totalLink++;
+                    totalDist += net.LinkByNodesID(iRoute[i], iRoute[i + 1]).distanceCost;
+                    ver = false;
+                    for (int j = 0; j < rRoute.Count - 1; j++)
+                    {
+                        if (iRoute[i] == rRoute[j] && iRoute[i + 1] == rRoute[j + 1])
+                        {
+                            ver = true;
+                            break;
+                        }
+                    }
+
+                    if (ver == true)
+                    {
+                        linkEq++;
+                        distEq += net.LinkByNodesID(iRoute[i], iRoute[i + 1]).distanceCost;
+                    }
+                    else
+                    {
+                        linkDif++;
+                        distDif += net.LinkByNodesID(iRoute[i], iRoute[i + 1]).distanceCost;
+                    }
+                }
+
+                percDifDist = distDif / totalDist;
+                percDifLink = linkDif / totalLink;
+                percSimilDist = distEq / totalDist;
+                percSimilLink = linkEq / totalLink;
+            }
         }
     }
 

@@ -81,6 +81,82 @@ namespace RouteBuilder
             }
             
         }
+
+        public  bool has_loop(List<int> pass)
+        {
+            for (int i = 0; i < pass.Count;i++)
+            {
+                for(int j = 0; j < pass.Count; j++)
+                {
+                    if (pass[i] == pass[j] && i != j)
+                        return true; 
+                }
+            }
+            return false;
+        }
+
+        public bool tiene_inter_loops(Vehicle virVehicle)
+        {
+            
+            List<int> passingReal = this.trips[0].passingNodes;
+            List<int> passingVirtual = virVehicle.trips[0].passingNodes;
+            if (passingVirtual.Count == 1)
+                return true;
+
+            List<int> actualSection = new List<int>();
+            int k = 0;
+            actualSection.Add(passingVirtual[k]);
+
+            for (int i = 1; i < passingReal.Count; i++)
+            {
+                if(passingReal[i] == passingVirtual[k+1])
+                {
+                    actualSection.Add(passingReal[i]);
+                    if(has_loop(actualSection))
+                    {
+                        return true;
+                    }
+
+                    actualSection = new List<int>();
+
+                    if (k <= passingVirtual.Count - 3)
+                    {
+                        k++;
+                        //i = 0;
+                        actualSection.Add(passingVirtual[k]);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                else
+                {
+                    actualSection.Add(passingReal[i]);
+                }
+            }
+            return false;
+        }
+
+        public void set_proporcion_equals(Network net)
+        {
+            foreach(Trip t in trips)
+            {
+                t.set_percSimil_Dif(net);
+            }
+        }
+
+        public void set_seedCat()
+        {
+            foreach(Trip t in trips)
+            {
+                foreach(Section s in t.sections)
+                {
+                    s.set_speedCat();
+                }
+            }
+        }
     }
 
 }

@@ -24,6 +24,11 @@ namespace RouteBuilder
 		public double ER_trips;
 		public double CR_trips;
         public double FPR2_trips;
+        public double probProm_trips;
+        public double probProm_section;
+        public double equalPercentProm;
+        public double equalPondProm;
+
 
         //Constructor
         public Scenario(Network net, DetectionsDB dets, DetectionsDB rDets, double T, double newTripTime, double newVisitTime, int K)
@@ -257,8 +262,65 @@ namespace RouteBuilder
 
                         }
                     }
-
             }
+
+        }
+
+        public void delete_cars()
+        {
+            List<int> deletingCarsPos = new List<int>();
+
+            for(int i = 0; i < rVehicles.Count; i ++)
+            {
+                if (rVehicles[i].tiene_inter_loops(vehicles[i]))
+                    deletingCarsPos.Add(i);
+                
+            }
+
+            deletingCarsPos.Sort();
+            deletingCarsPos.Reverse();
+
+            foreach(int del in deletingCarsPos)
+            {
+                vehicles.RemoveAt(del);
+                rVehicles.RemoveAt(del);
+            }
+        }
+
+        public void delete_car_no_inferenciable()
+        {
+            List<int> macsToDeletePos = new List<int>();
+            int i = 0;
+            foreach(Vehicle v in rVehicles)
+            {
+                bool sirve = false;
+                foreach(Vehicle vset in vehicles)
+                {
+                    if (v.MAC == vset.MAC)
+                    {
+                        sirve = true;
+                        break;
+                    }
+                }
+
+                if (sirve == false)
+                {
+                    macsToDeletePos.Add(i);
+                }
+
+                i++;
+            }
+
+            macsToDeletePos.Sort();
+            macsToDeletePos.Reverse();
+
+            foreach(int del in macsToDeletePos)
+            {
+                rVehicles.RemoveAt(del);
+            }
+
+            vehicles.Sort((x,y)=> x.MAC.CompareTo(y.MAC));
+            rVehicles.Sort((x, y) => x.MAC.CompareTo(y.MAC));
 
         }
 
@@ -408,7 +470,10 @@ namespace RouteBuilder
             {
                 foreach(Trip t in v.trips)
                 {
-
+                    if(v.MAC == 285)
+                    {
+                        Console.WriteLine("Escr"); 
+                    }
                     t.obiously = 1;
                     foreach(Section s in t.sections)
                     {
@@ -486,6 +551,19 @@ namespace RouteBuilder
 			}
 		}
 
+        public void deleting_loop_vehicles()
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                foreach(Trip t in v.trips)
+                {
+                    foreach(Section s in t.sections)
+                    {
+                        
+                    }
+                }
+            }
+        }
 
 
         public double[] min_max_period_ID()
@@ -727,13 +805,13 @@ namespace RouteBuilder
 
         public void trimrRoutes()
         {
-            foreach(Vehicle rv in rVehicles)
+            foreach (Vehicle rv in rVehicles)
             {
-                foreach(Vehicle v in vehicles)
+                foreach (Vehicle v in vehicles)
                 {
-                    if(rv.MAC == v.MAC)
+                    if (rv.MAC == v.MAC)
                     {
-                        for (int i = 0; i < rv.trips.Count;i++)
+                        for (int i = 0; i < rv.trips.Count; i++)
                         {
                             if (v.trips[i].sections.Count > 0)
                             {
@@ -862,6 +940,7 @@ namespace RouteBuilder
 			ER_trips = 0;
 			CR_trips = 0;
 			FPR2_trips = 0;
+            probProm_trips = 0;
 
             foreach (Vehicle v in this.vehicles)
             {
@@ -873,6 +952,7 @@ namespace RouteBuilder
                         {
                             t.set_mostProbRoutes();
                             totalInferencesTrip++;
+                            probProm_trips += t.routes[t.choice].prob;
                             if (t.choice == t.mostProbably)
                                 FPR_trips++;
                             if (t.choice == t.mostProbably || t.choice == t.secondBest)
@@ -884,6 +964,23 @@ namespace RouteBuilder
                     }
                 }
             }
+            probProm_trips = probProm_trips / totalInferencesTrip;
+        }
+
+        public void set_equalsPercent()
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                v.set_proporcion_equals(network);
+            }
+        }
+
+        public void set_speedCats()
+        {
+            foreach(Vehicle v in vehicles)
+            {
+                v.set_seedCat();
+            }
         }
 
 		public void calculate_statistics_section_new_version()
@@ -893,6 +990,7 @@ namespace RouteBuilder
             ER_sections = 0;
             CR_sections = 0;
             FPR2_sections = 0;
+            probProm_section = 0;
 
 			foreach (Vehicle v in this.vehicles)
 			{
@@ -906,6 +1004,7 @@ namespace RouteBuilder
                             {
                                 s.set_mostProbRoutes();
                                 totalInferencesSection++;
+                                probProm_section += s.paths[s.choice].finalProb;
                                 if (s.choice == s.MostProbably)
                                     FPR_sections++;
                                 if (s.choice == s.MostProbably || s.choice == s.SecondBest)
@@ -917,6 +1016,7 @@ namespace RouteBuilder
 					}
 				}
 			}
+            probProm_section = probProm_section / totalInferencesSection;
 		}
 
         public void calculate_statistics_trip()
@@ -1038,6 +1138,45 @@ namespace RouteBuilder
             sw.Close();
 
 		}
+
+        public void export_2_DB()
+        {
+            StreamWriter sw1 = new StreamWriter("tripDet.txt");
+            StreamWriter sw2 = new StreamWriter("seccDet.txt");
+
+            sw1.WriteLine("MAC; alternativas; MasProb; Elección; MaxProb; ElecProb; %linkOK; %linkNO; %DistOK; %DistNO");
+            sw2.WriteLine("MAC; alternativas; MasProb; Elección; MaxProb; ElecProb; velocidad");
+
+            foreach(Vehicle v in vehicles)
+            {
+                int MAC = v.MAC;
+                foreach (Trip t in v.trips)
+                {
+                    if (t.obiously == 0)
+                    {
+                        sw1.WriteLine(MAC + "; " + t.routes.Count + "; " + t.mostProbably + "; " + t.choice + "; " + t.routes[t.mostProbably].prob + "; " + t.routes[t.choice].prob + "; " + t.percSimilLink + "; " + t.percDifLink + "; " + t.percSimilDist + "; " + t.percDifDist);
+                    }
+                }
+            }
+
+            foreach (Vehicle v in vehicles)
+            {
+                int MAC = v.MAC;
+                foreach (Trip t in v.trips)
+                {
+                    foreach (Section s in t.sections)
+                    {
+                        if (s.obiously == 0)
+                        {
+                            sw2.WriteLine(MAC + "; " + s.paths.Count + "; " + s.MostProbably + "; " + s.choice + "; " + s.paths[s.MostProbably].finalProb + "; " + s.paths[s.choice].finalProb + "; " + s.SpeedCat);
+                        }
+                    }
+                }
+            }
+
+            sw1.Close();
+            sw2.Close();
+        }
 
         public void export_inference_vehicles()
         {
