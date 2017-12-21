@@ -470,10 +470,6 @@ namespace RouteBuilder
             {
                 foreach(Trip t in v.trips)
                 {
-                    if(v.MAC == 285)
-                    {
-                        Console.WriteLine("Escr"); 
-                    }
                     t.obiously = 1;
                     foreach(Section s in t.sections)
                     {
@@ -900,9 +896,17 @@ namespace RouteBuilder
                     {
                         for (int i = 0; i < r.nodes.Count - 1;i++)
                         {
-                            if(t.routes.Count>1)
-                                this.network.add_flowsEstInfer_to_link(r.nodes[i], r.nodes[i + 1], r.prob);
-
+                            if (t.routes.Count > 1)
+                            {
+                                int pe = 0;
+                                if (t.sections[0].period == 25 || t.sections[0].period == 26)
+                                    pe = 0;
+                                else if (t.sections[0].period == 27 || t.sections[0].period == 28)
+                                    pe = 1;
+                                else if (t.sections[0].period == 29 || t.sections[0].period == 30)
+                                    pe = 2;
+                                this.network.add_flowsEstInfer_to_link(r.nodes[i], r.nodes[i + 1], r.prob, pe);
+                            }
                             if(t.routes.Count>0)
                                 this.network.add_flowsEstAll_to_link(r.nodes[i],r.nodes[i+1],r.prob);
                         }
@@ -921,8 +925,17 @@ namespace RouteBuilder
                             for (int i = 0; i < t.routes[0].nodes.Count - 1; i++)
 							{
                                 if (v.trips[0].routes.Count > 1)
-                                    this.network.add_flowsRealInfer_to_link(t.routes[0].nodes[i], t.routes[0].nodes[i + 1]);
+                                {
+                                    int pe = 0;
+                                    if (t.sections[0].period == 25 || t.sections[0].period == 26)
+                                        pe = 0;
+                                    else if (t.sections[0].period == 27 || t.sections[0].period == 28)
+                                        pe = 1;
+                                    else if (t.sections[0].period == 29 || t.sections[0].period == 30)
+                                        pe = 2;
 
+                                    this.network.add_flowsRealInfer_to_link(t.routes[0].nodes[i], t.routes[0].nodes[i + 1], pe);
+                                }
 								if (v.trips[0].routes.Count > 0)
 									this.network.add_flowsRealAll_to_link(t.routes[0].nodes[i], t.routes[0].nodes[i + 1]);
 							}
@@ -1127,10 +1140,10 @@ namespace RouteBuilder
 			sw.WriteLine("FPR2 RATIO:   " + FPR2_trips / totalInferencesTrip);
 			sw.WriteLine("");
 			sw.WriteLine("FLOWS");
-			sw.WriteLine("Link\tTail\tHead\tRealAll\tEstAll\tRealInfer\tEstInfer");
+            sw.WriteLine("Link\tTail\tHead\tRealAll\tEstAll\tRealInfer\tEstInfer\tReInf1\tEstinf1\tReInf2\tEstinf2\tReInf3\tEstinf3");
 			foreach (Link l in network.links)
 			{
-				sw.WriteLine(l.ID + "\t" + l.tailNode.ID + "\t" + l.headNode.ID + "\t" + l.RealCountAllVehicles + "\t" + l.EstimatedCountAllVehicles + "\t" + l.RealCountInferencedVehicles + "\t" + l.EstimatedCountInferencedVehicles);
+                sw.WriteLine(l.ID + "\t" + l.tailNode.ID + "\t" + l.headNode.ID + "\t" + l.RealCountAllVehicles + "\t" + l.EstimatedCountAllVehicles + "\t" + l.RealCountInferencedVehicles + "\t" + l.EstimatedCountInferencedVehicles + "\t" + l.RealCountInferecedByTime[0] + "\t" + l.EstimatedCountInferecedByTime[0] + "\t" + l.RealCountInferecedByTime[1] + "\t" + l.EstimatedCountInferecedByTime[1] + "\t" + l.RealCountInferecedByTime[2] + "\t" + l.EstimatedCountInferecedByTime[2]);
 			}
 
 			sw.WriteLine("Thanks for chose TyggerSoftware Inc. 2017");

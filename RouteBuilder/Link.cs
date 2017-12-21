@@ -17,6 +17,8 @@ namespace RouteBuilder
         public double RealCountAllVehicles;
 		public double EstimatedCountInferencedVehicles;
 		public double EstimatedCountAllVehicles;
+        public double[] EstimatedCountInferecedByTime;
+        public double[] RealCountInferecedByTime;
 
 
         //Constructor from a RealLink
@@ -30,6 +32,9 @@ namespace RouteBuilder
             RealCountAllVehicles = 0;
             EstimatedCountInferencedVehicles = 0;
             EstimatedCountAllVehicles = 0;
+            EstimatedCountInferecedByTime = new double[] { 0, 0, 0 };
+            RealCountInferecedByTime = new double[] { 0, 0, 0 };
+            
         }
 
         //Constructor to make copies
@@ -45,6 +50,8 @@ namespace RouteBuilder
 			RealCountAllVehicles = 0;
 			EstimatedCountInferencedVehicles = 0;
 			EstimatedCountAllVehicles = 0;
+            EstimatedCountInferecedByTime = new double[] { 0, 0, 0 };
+            RealCountInferecedByTime = new double[] { 0, 0, 0 };
         }
 
         //Method 1: Add the tail node element

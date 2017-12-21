@@ -82,6 +82,10 @@ namespace RouteBuilder
         {
 			List<int> candidates = new List<int>();
 
+            if(this.detections[0].MAC==429)
+            {
+                Console.WriteLine("asas");
+            }
 			List<Route> routess  = new List<Route>();
             foreach (Route r in routes)
 			{
@@ -103,13 +107,13 @@ namespace RouteBuilder
             }
 
 			int rand = rnd.Next(0, candidates.Count);
-			mostProbably = rand;
+            mostProbably = candidates[rand];
 			candidates.Remove(rand);
 
 			if (candidates.Count > 0)
 			{
 				rand = rnd.Next(0, candidates.Count);
-				secondBest = rand;
+				secondBest = candidates[rand];
 			}
 			else
 			{
@@ -121,7 +125,7 @@ namespace RouteBuilder
 					}
 				}
 				rand = rnd.Next(0, candidates.Count);
-				secondBest = rand;
+				secondBest = candidates[rand];
 				candidates.Remove(rand);
 			}
         }

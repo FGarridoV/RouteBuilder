@@ -12,7 +12,7 @@ namespace RouteBuilder
             double T = 15 * 60;
             int k = 10;
             double radious = 25;
-            int version = 2;
+            int version = 4;
 
             Console.WriteLine("Welcome to Route Builder v1.0 by TyggerSoftware Inc.\n");
 

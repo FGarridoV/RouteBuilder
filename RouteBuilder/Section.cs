@@ -118,13 +118,13 @@ namespace RouteBuilder
             }
 
             int rand = rnd.Next(0, candidates.Count);
-            MostProbably = rand;
+            MostProbably = candidates[rand];
             candidates.Remove(rand);
 
             if (candidates.Count > 0)
             {
                 rand = rnd.Next(0, candidates.Count);
-                SecondBest = rand;
+                SecondBest = candidates[rand];
             }
             else
             {
@@ -136,7 +136,7 @@ namespace RouteBuilder
                     }
                 }
                 rand = rnd.Next(0, candidates.Count);
-                SecondBest = rand;
+                SecondBest = candidates[rand];
                 candidates.Remove(rand);
             }
         }

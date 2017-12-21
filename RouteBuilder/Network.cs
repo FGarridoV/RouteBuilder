@@ -41,9 +41,25 @@ namespace RouteBuilder
             LinkByNodesID(tailnode,headnode).RealCountAllVehicles++; 
         }
 
-        public void add_flowsRealInfer_to_link(int tailnode, int headnode)
+        public void add_flowsRealInfer_to_link(int tailnode, int headnode, int period)
 		{
             LinkByNodesID(tailnode, headnode).RealCountInferencedVehicles++;
+
+            if (period == 0)
+            {
+                LinkByNodesID(tailnode, headnode).RealCountInferecedByTime[0]++;
+            }
+
+            else if (period == 1)
+            {
+                LinkByNodesID(tailnode, headnode).RealCountInferecedByTime[1]++;
+            }
+
+            else if (period == 2)
+            {
+                LinkByNodesID(tailnode, headnode).RealCountInferecedByTime[2]++;
+            }
+
 		}
 
         public void add_flowsEstAll_to_link(int tailnode, int headnode, double val)
@@ -51,9 +67,24 @@ namespace RouteBuilder
             LinkByNodesID(tailnode, headnode).EstimatedCountAllVehicles+=val;
 		}
 
-        public void add_flowsEstInfer_to_link(int tailnode, int headnode, double val)
+        public void add_flowsEstInfer_to_link(int tailnode, int headnode, double val, int period)
 		{
             LinkByNodesID(tailnode, headnode).EstimatedCountInferencedVehicles+=val;
+
+            if(period == 0)
+            {
+                LinkByNodesID(tailnode, headnode).EstimatedCountInferecedByTime[0] += val;
+            }
+
+            else if (period == 1)
+            {
+                LinkByNodesID(tailnode, headnode).EstimatedCountInferecedByTime[1] += val;
+            }
+
+            else if (period == 2)
+            {
+                LinkByNodesID(tailnode, headnode).EstimatedCountInferecedByTime[2] += val;
+            }
 		}
 
         //Constructor to make copies
@@ -279,6 +310,7 @@ namespace RouteBuilder
         //Method 11: Determine Kht shortest path
         public List<Path> YenKsP(int sourceNodeID, int sinkNodeID, int K, int costType)
         {
+
             this.set_angularCosts(sinkNodeID);
             this.add_mainCost(costType);
             Network netAux = new Network(this);
@@ -392,8 +424,15 @@ namespace RouteBuilder
                 {
                     return A;
                 }
+
+                if (A.Count <= k + 1)
+                {
+                    return A;
+                }
             }
             return A;
+
+
         }
 
 
