@@ -98,13 +98,13 @@ class Network:
         self.add_geometry_links()
     
     def set_nodes(self, path_base):
-        nodesFile = path_base.replace('*', 'Nodes.ty')
+        nodesFile = path_base.replace('*', 'nodes.ty')
         dfn = pd.read_csv(nodesFile, names = ['node', 'x', 'y', 'bt'], skiprows=1)
         dfn['geometry'] = dfn.apply(lambda row: Point(row['x'], row['y']), axis = 1)
         return gpd.GeoDataFrame(dfn)
     
     def set_real_links(self, path_base):
-        linksFile = path_base.replace('*', 'Links.ty')
+        linksFile = path_base.replace('*', 'links.ty')
         dfl = pd.read_csv(linksFile, names = ['link', 'o', 'd'], skiprows=1)
         dfl['geometry'] = dfl.apply(lambda row: LineString([Tools.point_node(self.nodes, row['o']), Tools.point_node(self.nodes, row['d'])]), axis = 1)
         return gpd.GeoDataFrame(dfl)
