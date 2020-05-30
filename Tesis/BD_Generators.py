@@ -407,23 +407,26 @@ class Escenario:
     
     def set_angular_costs_and_distance_chosen_non_vehicles(self):
         for v in self.non_vehicles:
-            for r  in v.routes:
-                angular_cost_aux = 0
-                distance_aux = 0
-                time_aux = 0
-                sink_node = r.nodes[-1]
-                for i, n in enumerate(r.nodes[:-1]):
-                    origin_node = r.nodes[i]
-                    destination_node = r.nodes[i+1]
-                    values = self.angular_cost_and_distance(origin_node, destination_node, sink_node)
-                    angular_cost_aux += values[0]
-                    distance_aux += values[1]
-                    time_aux += self.dtimes[(r.nodes[i], Tools.time_gap(v.first_view))]
-                    time_aux += self.ttimes[(r.nodes[i], r.nodes[i+1], Tools.time_gap(v.first_view))]
-                time_aux += self.dtimes[(r.nodes[-1], Tools.time_gap(v.first_view))]
-                r.set_angular_cost(angular_cost_aux)
-                r.set_distance(distance_aux)
-                r.set_time(time_aux)
+            try:
+                for r  in v.routes:
+                    angular_cost_aux = 0
+                    distance_aux = 0
+                    time_aux = 0
+                    sink_node = r.nodes[-1]
+                    for i, n in enumerate(r.nodes[:-1]):
+                        origin_node = r.nodes[i]
+                        destination_node = r.nodes[i+1]
+                        values = self.angular_cost_and_distance(origin_node, destination_node, sink_node)
+                        angular_cost_aux += values[0]
+                        distance_aux += values[1]
+                        time_aux += self.dtimes[(r.nodes[i], Tools.time_gap(v.first_view))]
+                        time_aux += self.ttimes[(r.nodes[i], r.nodes[i+1], Tools.time_gap(v.first_view))]
+                    time_aux += self.dtimes[(r.nodes[-1], Tools.time_gap(v.first_view))]
+                    r.set_angular_cost(angular_cost_aux)
+                    r.set_distance(distance_aux)
+                    r.set_time(time_aux)
+            except:
+                self.non_vehicles.remove(v)
                 
     def angular_cost_and_distance(self, o_node, d_node, s_node):
         tail_node = self.network.nodes.loc[self.network.nodes['node'] == o_node]
